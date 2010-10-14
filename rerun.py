@@ -24,36 +24,28 @@ SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
 
 
-# the command to be rerun
-# populated from all args on the command-line
-command = None
-
-
 def process_command_line(argv):
-    global command
+    # The command to be rerun is created from the command-line
     if len(argv) > 1:
         command = ' '.join(argv[1:])
     else:
         command = 'nosetests'
+    return command
 
 
 def skip_dirs(dirs):
-    for skip in SKIP_DIRS:
-        if skip in dirs:
-            dirs.remove(skip)
+    for dirname in SKIP_DIRS:
+        if dirname in dirs:
+            dirs.remove(dirname)
 
 
-def filter_files(files):
-    for filename in files:
-        if not any(filename.endswith(skip) for skip in SKIP_EXT):
-            yield filename
+def extension_ok(filename):
+    return not any(filename.endswith(ext) for ext in SKIP_EXT)
 
 
 def get_file_stats(filename):
     stats = os.stat(filename)
-    size = stats[stat.ST_SIZE]
-    modification_time = stats[stat.ST_MTIME]
-    return size, modification_time
+    return stats[stat.ST_SIZE], stats[stat.ST_MTIME]
 
 
 file_stats = {}
@@ -80,7 +72,7 @@ def any_files_changed():
     changed = False
     for root, dirs, files in os.walk('.'):
         skip_dirs(dirs)
-        for filename in filter_files(files):
+        for filename in filter(extension_ok, files):
             changed |= has_file_changed(os.path.join(root, filename))
 
     return changed
@@ -94,12 +86,12 @@ def clear_screen():
         
 
 def main():
-    process_command_line(sys.argv)
+    command = process_command_line(sys.argv)
     while True:
         if any_files_changed():
             clear_screen()
             os.system(command)
-        time.sleep (1)
+        time.sleep(1)
 
 
 if __name__ == '__main__':
