@@ -86,11 +86,18 @@ def any_files_changed():
     return changed
 
 
+def clear_screen():
+    if sys.platform.startswith('win'):
+        os.system('cls')
+    else:
+        os.system('clear')
+        
+
 def main():
     process_command_line(sys.argv)
     while True:
         if any_files_changed():
-            os.system('cls')
+            clear_screen()
             os.system(command)
         time.sleep (1)
 
