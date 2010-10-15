@@ -20,7 +20,7 @@ class Test_Rerun(TestCase):
         )
 
 
-    def test_skip_dirs(self):
+    def test_skip_dirs_modifies_in_place(self):
         dirs = ['a', '.svn', 'b', '.git', 'c', '.hg', 'd', '.bzr',
                 'e', 'build', 'f', 'dist', 'g', ]
         skip_dirs(dirs)

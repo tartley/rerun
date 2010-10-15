@@ -4,12 +4,7 @@ rerun [command]
 Poll for changes to any files in cwd or subdirs.
 On seeing changes, run the given command (defaults to 'nosetests'.) 
 
-http://bitbucket.org/tartley/rerun
-
-Only tested on WindowsXP, Python 2.7.
-
-By Jonathan Hartley, http://tartley.com
-Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
+By Jonathan Hartley, tartley@tartley.com
 '''
 
 import os
@@ -69,12 +64,14 @@ def any_files_changed():
     Walks subdirs of cwd, looking for files which have changed since last
     invokation.
     '''
+    # it's important we don't short circuit on finding the first
+    # changed file. We must call has_file_changed on all files in
+    # order for it to update its index in prep for future scans
     changed = False
     for root, dirs, files in os.walk('.'):
         skip_dirs(dirs)
         for filename in filter(extension_ok, files):
             changed |= has_file_changed(os.path.join(root, filename))
-
     return changed
 
 
