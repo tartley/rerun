@@ -62,7 +62,7 @@ def has_file_changed(filename):
 def any_files_changed():
     '''
     Walks subdirs of cwd, looking for files which have changed since last
-    invokation.
+    invocation.
     '''
     # it's important we don't short circuit on finding the first
     # changed file. We must call has_file_changed on all files in
