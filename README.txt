@@ -2,6 +2,8 @@ RERUN
 
     http://bitbucket.org/tartley/rerun
 
+    Only currently tested on WindowsXP with Python2.7.
+
 USAGE
 
     rerun [command]
@@ -19,8 +21,7 @@ DESCRIPTION
     detects changes to any file in the current directory or its
     subdirectories.
 
-    Rerun requires that Python is installed and on the PATH. Only tested on
-    Windows with Python2.7.
+    Rerun requires that Python is installed and on the PATH.
 
     It detects changes to files by polling once per second. On each poll, it
     walks the files in the current directory and all recursive subdirs. For
@@ -30,13 +31,19 @@ DESCRIPTION
     It ignores directories called .svn, .git, .hg, .bzr, build and dist.
     It ignores files ending with .pyc or .pyo.
 
+INSTALL
+
+    Put the file rerun.py on the PATH.
+
+    On Windows, you might need to associate the .py extension with your Python
+    executable. In order to be able to type 'rerun' instead of 'rerun.py',
+    you might like to add '.py' to the PATHEXT environment variable.
 
 THANKS
 
-    The idea came from the bash command 'watch', and inspiration for the
-    improved implementation came from a blog post by Jeff Winkler, whos
+    The idea came from the bash command 'watch', and inspiration for this
+    improved implementation came from an old blog post by Jeff Winkler, whos
     website http://jeffwinkler.net seems to have now died.
-
 
 CONTACT
 
