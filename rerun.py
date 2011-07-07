@@ -1,46 +1,54 @@
+#!/usr/bin/env python2.7
 '''
-rerun [command]
+testrunner [command]
 
 Poll for changes to any files in cwd or subdirs.
 On seeing changes, run the given command (defaults to 'nosetests'.) 
 
-By Jonathan Hartley, tartley@tartley.com
+Tested on Python 2.7, Ubuntu, WindowsXP and OSX.
+
+By Jonathan Hartley, http://tartley.com
+Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
 '''
 
 import os
+import platform
 import stat
 import sys
 import time
 
 
-# skip these directories
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
-# skip files with these extensions
 SKIP_EXT = ['.pyc', '.pyo']
 
 
+command = None
+
 def process_command_line(argv):
-    # The command to be rerun is created from the command-line
+    global command
     if len(argv) > 1:
         command = ' '.join(argv[1:])
     else:
         command = 'nosetests'
-    return command
-
-
-def skip_dirs(dirs):
-    for dirname in SKIP_DIRS:
-        if dirname in dirs:
-            dirs.remove(dirname)
-
-
-def extension_ok(filename):
-    return not any(filename.endswith(ext) for ext in SKIP_EXT)
 
 
 def get_file_stats(filename):
     stats = os.stat(filename)
-    return stats[stat.ST_SIZE], stats[stat.ST_MTIME]
+    size = stats[stat.ST_SIZE]
+    modification_time = stats[stat.ST_MTIME]
+    return size, modification_time
+
+
+def skip_dirs(dirs):
+    for skip in SKIP_DIRS:
+        if skip in dirs:
+            dirs.remove(skip)
+
+
+def filter_files(files):
+    for filename in files:
+        if not any(filename.endswith(skip) for skip in SKIP_EXT):
+            yield filename
 
 
 file_stats = {}
@@ -62,29 +70,28 @@ def has_file_changed(filename):
 def any_files_changed():
     '''
     Walks subdirs of cwd, looking for files which have changed since last
-    invocation.
+    invokation.
     '''
-    # it's important we don't short circuit on finding the first
-    # changed file. We must call has_file_changed on all files in
-    # order for it to update its index in prep for future scans
     changed = False
     for root, dirs, files in os.walk('.'):
         skip_dirs(dirs)
-        for filename in filter(extension_ok, files):
-            changed |= has_file_changed(os.path.join(root, filename))
+        for filename in filter_files(files):
+            fullname = os.path.join(root, filename)
+            changed |= has_file_changed(fullname)
+
     return changed
 
 
 def clear_screen():
-    if sys.platform.startswith('win'):
-        os.system('cls')
-    else:
+    if platform.system() == 'Darwin':
         os.system('clear')
-        
+    else:
+        os.system('cls')
+
 
 def main():
-    command = process_command_line(sys.argv)
-    while True:
+    process_command_line(sys.argv)
+    while (True):
         if any_files_changed():
             clear_screen()
             os.system(command)
