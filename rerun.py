@@ -17,19 +17,39 @@ import stat
 import sys
 import time
 
+USAGE = '''
+rerun [<options>] <command>
+
+Runs <command> whenever files in the current dir or subdirs change.
+Works by polling every second for file modification time or size changes.
+
+Options may contain:
+
+    --verbose|-v    List changed files before <command> output.
+'''
 
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
 
 
-command = None
+class Options(object):
+    command = None
+    verbose = None
+
 
 def process_command_line(argv):
-    global command
-    if len(argv) > 1:
-        command = ' '.join(argv[1:])
+    options = Options()
+
+    if argv and argv[0] in ['--verbose', '-v']:
+        options.verbose = True
+        argv = argv[1:]
+
+    if argv:
+        options.command = ' '.join(argv)
     else:
-        command = 'nosetests'
+        sys.exit(USAGE)
+
+    return options
 
 
 def get_file_stats(filename):
@@ -67,17 +87,18 @@ def has_file_changed(filename):
     return False
  
 
-def any_files_changed():
+def changed_files():
     '''
     Walks subdirs of cwd, looking for files which have changed since last
     invokation.
     '''
-    changed = False
+    changed = []
     for root, dirs, files in os.walk('.'):
         skip_dirs(dirs)
         for filename in filter_files(files):
             fullname = os.path.join(root, filename)
-            changed |= has_file_changed(fullname)
+            if has_file_changed(fullname):
+                changed.append(fullname)
 
     return changed
 
@@ -90,13 +111,17 @@ def clear_screen():
 
 
 def main():
-    process_command_line(sys.argv)
-    while (True):
-        if any_files_changed():
+    options = process_command_line(sys.argv[1:])
+    while True:
+        changed = changed_files()
+        if changed:
             clear_screen()
-            os.system(command)
+            if options.verbose:
+                print '\n'.join(changed)
+            os.system(options.command)
         time.sleep(1)
 
 
 if __name__ == '__main__':
     main()
+
