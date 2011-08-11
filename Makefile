@@ -3,5 +3,6 @@ none:
 
 install:
 	chmod 755 rerun.py
-	cp -p rerun.py ~/bin
+	cp -p rerun.py ~/docs/bin
+	ln -s ~/docs/bin/rerun.py ~/docs/bin/rerun
 
