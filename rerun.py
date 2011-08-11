@@ -126,7 +126,6 @@ def main():
             clear_screen()
             if options.verbose:
                 print '\n'.join(changed)
-                print 'skips', options.skip_dirs
             os.system(options.command)
         time.sleep(1)
 
