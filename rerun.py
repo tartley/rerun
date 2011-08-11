@@ -9,8 +9,9 @@ Tested on Python 2.7, Ubuntu, WindowsXP and OSX.
 
 By Jonathan Hartley, http://tartley.com
 Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
+See also project 'watchdog', which does the same thing but better, by hooking
+into OS-level file change notifications, instead of polling.
 '''
-
 import os
 import platform
 import stat
@@ -35,14 +36,21 @@ SKIP_EXT = ['.pyc', '.pyo']
 class Options(object):
     command = None
     verbose = None
+    skip_dirs = SKIP_DIRS
 
 
 def process_command_line(argv):
     options = Options()
 
-    if argv and argv[0] in ['--verbose', '-v']:
-        options.verbose = True
-        argv = argv[1:]
+    while argv:
+        if argv[0] in ['--verbose', '-v']:
+            options.verbose = True
+            argv = argv[1:]
+        if argv[0] in ['--ignore', '-i']:
+            options.skip_dirs.append(argv[1])
+            argv = argv[2:]
+        else:
+            break
 
     if argv:
         options.command = ' '.join(argv)
@@ -59,8 +67,8 @@ def get_file_stats(filename):
     return size, modification_time
 
 
-def skip_dirs(dirs):
-    for skip in SKIP_DIRS:
+def skip_dirs(dirs, skips):
+    for skip in skips:
         if skip in dirs:
             dirs.remove(skip)
 
@@ -87,14 +95,14 @@ def has_file_changed(filename):
     return False
  
 
-def changed_files():
+def changed_files(skips):
     '''
     Walks subdirs of cwd, looking for files which have changed since last
     invokation.
     '''
     changed = []
     for root, dirs, files in os.walk('.'):
-        skip_dirs(dirs)
+        skip_dirs(dirs, skips)
         for filename in filter_files(files):
             fullname = os.path.join(root, filename)
             if has_file_changed(fullname):
@@ -113,11 +121,12 @@ def clear_screen():
 def main():
     options = process_command_line(sys.argv[1:])
     while True:
-        changed = changed_files()
+        changed = changed_files(options.skip_dirs)
         if changed:
             clear_screen()
             if options.verbose:
                 print '\n'.join(changed)
+                print 'skips', options.skip_dirs
             os.system(options.command)
         time.sleep(1)
 
