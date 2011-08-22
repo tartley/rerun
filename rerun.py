@@ -9,7 +9,7 @@ Tested on Python 2.7, Ubuntu, WindowsXP and OSX.
 
 By Jonathan Hartley, http://tartley.com
 Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
-See also project 'watchdog', which does the same thing but better, by hooking
+S)ee also project 'watchdog', which does the same thing but better, by hooking
 into OS-level file change notifications, instead of polling.
 '''
 import os
@@ -26,7 +26,8 @@ Works by polling every second for file modification time or size changes.
 
 Options may contain:
 
-    --verbose|-v    List changed files before <command> output.
+    --verbose|-v     List changed files before <command> output.
+    --ignore|-i <d>  Directory to ignore
 '''
 
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
@@ -36,7 +37,7 @@ SKIP_EXT = ['.pyc', '.pyo']
 class Options(object):
     command = None
     verbose = None
-    skip_dirs = SKIP_DIRS
+    ignoreds = SKIP_DIRS
 
 
 def process_command_line(argv):
@@ -46,16 +47,16 @@ def process_command_line(argv):
         if argv[0] in ['--verbose', '-v']:
             options.verbose = True
             argv = argv[1:]
-        if argv[0] in ['--ignore', '-i']:
-            options.skip_dirs.append(argv[1])
+        elif argv[0] in ['--ignore', '-i']:
+            options.ignoreds.append(argv[1])
             argv = argv[2:]
         else:
             break
 
-    if argv:
-        options.command = ' '.join(argv)
-    else:
+    if not argv:
         sys.exit(USAGE)
+
+    options.command = ' '.join(argv)
 
     return options
 
@@ -73,10 +74,11 @@ def skip_dirs(dirs, skips):
             dirs.remove(skip)
 
 
-def filter_files(files):
-    for filename in files:
-        if not any(filename.endswith(skip) for skip in SKIP_EXT):
-            yield filename
+def skip_file(filename, ignoreds):
+    return (
+        any(os.path.normpath(filename) == ignored for ignored in ignoreds) or
+        any(filename.endswith(skip) for skip in SKIP_EXT)
+    )
 
 
 file_stats = {}
@@ -95,16 +97,18 @@ def has_file_changed(filename):
     return False
  
 
-def changed_files(skips):
+def changed_files(ignoreds):
     '''
     Walks subdirs of cwd, looking for files which have changed since last
     invokation.
     '''
     changed = []
     for root, dirs, files in os.walk('.'):
-        skip_dirs(dirs, skips)
-        for filename in filter_files(files):
+        skip_dirs(dirs, ignoreds)
+        for filename in files:
             fullname = os.path.join(root, filename)
+            if skip_file(fullname, ignoreds):
+                continue
             if has_file_changed(fullname):
                 changed.append(fullname)
 
@@ -121,7 +125,7 @@ def clear_screen():
 def main():
     options = process_command_line(sys.argv[1:])
     while True:
-        changed = changed_files(options.skip_dirs)
+        changed = changed_files(options.ignoreds)
         if changed:
             clear_screen()
             if options.verbose:
