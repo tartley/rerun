@@ -2,18 +2,18 @@ RERUN
 
     http://bitbucket.org/tartley/rerun
 
-    Only currently tested on WindowsXP with Python2.7.
+    Tested on WindowsXP, Windows 7, MacOSX, and Ubuntu
+    Runs under Python2.7 or 3.2.
 
 USAGE
 
     rerun [command]
 
-    e.g:
-    rerun python -m unittest package.testmodule
-    rerun python -m unittest --verbose package.testmodule.testclass.testmethod
+    e.g::
 
-    If 'command' is not given, it defaults to 'nosetests', a Python unit test
-    running utility.
+        rerun python -m unittest mypackage.mymodule
+
+    will rerun your tests every time you save your source code.
 
 DESCRIPTION
 
@@ -33,11 +33,15 @@ DESCRIPTION
 
 INSTALL
 
-    Put the file rerun.py on the PATH.
+    On most operating systems, just copy or symlink the script somewhere on
+    your PATH, e.g::
+    
+        ln -s path/to/rerun.py ~/bin/rerun
 
     On Windows, you might need to associate the .py extension with your Python
-    executable. In order to be able to type 'rerun' instead of 'rerun.py',
-    you might like to add '.py' to the PATHEXT environment variable.
+    executable, so you can run by typing "rerun.py" instead of
+    "python rerun.py". If you add '.py' to your PATHEXT environment variable,
+    then you can run by typing just "rerun".
 
 THANKS
 

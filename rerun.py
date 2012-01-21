@@ -1,16 +1,14 @@
 #!/usr/bin/env python2.7
 '''
-testrunner [command]
+rerun
 
-Poll for changes to any files in cwd or subdirs.
-On seeing changes, run the given command (defaults to 'nosetests'.) 
+Tested on Python 2.7 & 3.2, on Ubuntu, WindowsXP, Windows7 and OSX.
 
-Tested on Python 2.7, Ubuntu, WindowsXP and OSX.
+Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
+See also project 'watchdog', which does the same thing but better, by hooking
+into OS-level file change notifications, instead of polling.
 
 By Jonathan Hartley, http://tartley.com
-Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
-S)ee also project 'watchdog', which does the same thing but better, by hooking
-into OS-level file change notifications, instead of polling.
 '''
 import os
 import platform
@@ -21,8 +19,9 @@ import time
 USAGE = '''
 rerun [<options>] <command>
 
-Runs <command> whenever files in the current dir or subdirs change.
-Works by polling every second for file modification time or size changes.
+Clears the screen and runs the given command whenever files change in the
+current directory or subdirectories. Works by polling every second for file
+modification time or size changes.
 
 Options may contain:
 
@@ -129,7 +128,7 @@ def main():
         if changed:
             clear_screen()
             if options.verbose:
-                print '\n'.join(changed)
+                print('\n'.join(changed))
             os.system(options.command)
         time.sleep(1)
 
