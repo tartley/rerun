@@ -1,0 +1,3 @@
+pylint:
+	pylint rerun.py
+
