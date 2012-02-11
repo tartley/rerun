@@ -1,14 +1,11 @@
 #!/usr/bin/env python2.7
 '''
-rerun
+rerun <command>
 
-Tested on Python 2.7 & 3.2, on Ubuntu, WindowsXP, Windows7 and OSX.
+Polls for changes to any file under the current directory and runs <command>
+whenever it finds any.
 
-Thanks to Jeff Winkler for the original formulation, http://jeffwinkler.net
-See also project 'watchdog', which does the same thing but better, by hooking
-into OS-level file change notifications, instead of polling.
-
-By Jonathan Hartley, http://tartley.com
+See README for details.
 '''
 import os
 import platform
