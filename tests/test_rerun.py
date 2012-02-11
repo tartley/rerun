@@ -1,38 +1,16 @@
-
-from mock import patch
-from unittest import TestCase, main as unittest_main
-
 from os.path import join
 import stat
+from unittest import TestCase, main as unittest_main
+
+from mock import Mock, patch
 
 from rerun import (
-    any_files_changed, clear_screen, extension_ok, get_file_stats,
-    has_file_changed, main, process_command_line, skip_dirs,
+    changed_files, clear_screen, get_file_mtime, has_file_changed, main,
+    skip_dirs, SKIP_EXT, skip_file,
 )
 
 
 class Test_Rerun(TestCase):
-
-    def test_process_command_line(self):
-        self.assertEquals(
-            process_command_line(['rerun.py', 'hello', 'there']),
-            'hello there'
-        )
-
-
-    def test_skip_dirs_modifies_in_place(self):
-        dirs = ['a', '.svn', 'b', '.git', 'c', '.hg', 'd', '.bzr',
-                'e', 'build', 'f', 'dist', 'g', ]
-        skip_dirs(dirs)
-        self.assertEquals(dirs, list('abcdefg'))
-
-
-    def test_extension_ok(self):
-        for filename in ['a.pyo', 'a.pyc']:
-            self.assertFalse(extension_ok(filename))
-        for filename in ['a.py', 'Makefile']:
-            self.assertTrue(extension_ok(filename))
-
 
     @patch('rerun.os')
     def test_get_file_stats(self, mock_os):
@@ -40,128 +18,132 @@ class Test_Rerun(TestCase):
             self.assertEquals(filename, 'hello')
             return mock_filestat
         mock_os.stat = mock_stat
-        mock_filestat = {stat.ST_SIZE: 123, stat.ST_MTIME: 'mtime'}
+        mock_filestat = {stat.ST_MTIME: 'mymtime'}
 
-        size, time = get_file_stats('hello')
+        time = get_file_mtime('hello')
 
-        self.assertEquals(size, 123)
-        self.assertEquals(time, 'mtime')
+        self.assertEquals(time, 'mymtime')
 
 
-    @patch('rerun.get_file_stats')
+    def test_skip_dirs_modifies_in_place(self):
+        dirs = ['a', 'b', 'c', 'd', 'e', 'f'] 
+        skip_dirs(dirs, ['b', 'd', 'f'])
+        self.assertEquals(dirs, ['a', 'c', 'e'])
+
+
+    def test_skip_file(self):
+        self.assertFalse(skip_file('h.txt', []))
+
+
+    def test_skip_file_for_ignored(self):
+        self.assertTrue(skip_file('h.txt', ['h.txt']))
+
+
+    def test_skip_file_works_on_basename(self):
+        self.assertTrue(skip_file(r'somedir/h.txt', ['h.txt']))
+
+
+    def test_skip_file_for_extension(self):
+        self.assertTrue(skip_file('h' + SKIP_EXT[0], []))
+
+
+    @patch('rerun.get_file_mtime')
     def test_has_file_changed_return_value(self, mock_get_file_stats):
-        file_stats = [
-            (123, 'monday'),
-            (123, 'monday'),
-            (999, 'monday'),
-            (999, 'tuesday'),
-            (999, 'tuesday'),
-        ]
+        file_stats = ['mon', 'mon', 'tue', 'tue']
         mock_get_file_stats.side_effect = lambda _: file_stats.pop(0)
 
         self.assertTrue(has_file_changed('filename'))
         self.assertFalse(has_file_changed('filename'))
         self.assertTrue(has_file_changed('filename'))
-        self.assertTrue(has_file_changed('filename'))
         self.assertFalse(has_file_changed('filename'))
 
 
-    @patch('rerun.os.walk')
-    @patch('rerun.skip_dirs')
+    @patch('rerun.skip_file')
     @patch('rerun.has_file_changed')
-    def test_any_files_changed_return_value(
-        self, mock_has_file_changed, mock_skip_dirs, mock_walk
-    ):
-        walk_values = [
-            [('root1', 'dirs', 'files')],
-            [('root2', 'dirs', 'files')],
-            [('root3', 'dirs', 'files')],
+    @patch('rerun.os')
+    def test_changed_files(self, mock_os, mock_changed, mock_skip):
+        mock_os.walk.return_value = [
+            ('root1', list('dirs1'), list('files')),
         ]
-        mock_walk.side_effect = lambda _: walk_values.pop(0)
-
+        mock_os.path.join = join
         # one bool for each file in ['f' 'i' 'l' 'e' 's']
         has_file_changed_values = [
-            False, False, False, False, False, # should return false
-            False, False, False, False, True,  # should return true
-            True, False, False, False, False,  # should return true
+            True, False, False, False, True,   # 1st & last file changed
         ]
-        mock_has_file_changed.side_effect = \
-            lambda _: has_file_changed_values.pop(0)
+        mock_changed.side_effect = lambda _: has_file_changed_values.pop(0)
+        mock_skip.return_value = False
 
-        self.assertFalse(any_files_changed())
-        self.assertTrue(any_files_changed())
-        self.assertTrue(any_files_changed())
+        actual = changed_files([])
 
+        self.assertEqual(actual, ['root1/f', 'root1/s'])
         # must call has_file_changed for every file, cannot short-circuit
-        self.assertEquals(mock_has_file_changed.call_count, 15)
+        self.assertEquals(mock_changed.call_count, 5)
 
 
-    @patch('rerun.os.walk')
-    @patch('rerun.skip_dirs')
+    @patch('rerun.skip_file')
     @patch('rerun.has_file_changed')
-    def test_any_files_changed_skips_dirs(
-        self, mock_has_file_changed, mock_skip_dirs, mock_walk
-    ):
-        mock_has_file_changed.return_value = False
-
-        walk_values = [
-            [('root1', list('dirs1'), 'files')],
-            [('root2', list('dirs2'), 'files')],
-            [('root3', list('d3'), 'files')],
+    @patch('rerun.os')
+    def test_changed_files_skips_files(self, mock_os, mock_changed, mock_skip):
+        mock_os.walk.return_value = [
+            ('root1', list('dirs1'), list('files')),
         ]
-        mock_walk.side_effect = lambda _: walk_values.pop(0)
+        mock_os.path.join = join
+        # one bool for each file in ['f' 'i' 'l' 'e' 's']
+        has_file_changed_values = [
+            True, False, False, False, True,   # 1st & last file changed
+        ]
+        mock_changed.side_effect = lambda _: has_file_changed_values.pop(0)
+        mock_skip.return_value = False
 
-        any_files_changed()
-        any_files_changed()
-        any_files_changed()
+        actual = changed_files(['f'])
 
-        self.assertEquals(
-            [args[0][0] for args in mock_skip_dirs.call_args_list],
-            [ list('dirs1'), list('dirs2'), list('d3'), ],
+        self.assertEqual(actual, ['root1/f', 'root1/s'])
+        # must call has_file_changed for every file, cannot short-circuit
+        self.assertEquals(mock_changed.call_count, 5)
+
+
+    @patch('rerun.os')
+    @patch('rerun.skip_dirs')
+    def test_changed_files_calls_skip_dirs(self, mock_skip_dirs, mock_os):
+        mock_os.walk.return_value = [
+            ('root1', list('dirs1'), list('files')),
+            ('root2', list('dirs2'), list('files')),
+        ]
+        ignoreds = []
+
+        changed_files(ignoreds)
+
+        self.assertEqual(
+            mock_skip_dirs.call_args_list,
+            [
+                ((list('dirs1'), ignoreds), ),
+                ((list('dirs2'), ignoreds), ),
+            ]
         )
 
 
-    @patch('rerun.os.walk')
-    @patch('rerun.skip_dirs')
-    @patch('rerun.has_file_changed')
-    def test_any_files_changed_filter_files(
-        self, mock_has_file_changed, mock_skip_dirs, mock_walk
-    ):
-        mock_has_file_changed.return_value = False
-
-        files = ['f1', 'f2.pyc', 'f3.pyo', 'f4.py']
-        walk_values = [
-            [('root', 'dirs', files)],
-        ]
-        mock_walk.side_effect = lambda _: walk_values.pop(0)
-
-        any_files_changed()
-
-        self.assertEquals(
-            [args[0][0] for args in mock_has_file_changed.call_args_list],
-            [join('root', 'f1'), join('root', 'f4.py')]
-        )
-
-
-    @patch('rerun.sys')
-    @patch('rerun.os.system')
-    def test_clear_screen(self, mock_system, mock_sys):
-        mock_sys.platform = 'win32'
+    @patch('rerun.platform')
+    @patch('rerun.os')
+    def test_clear_screen(self, mock_os, mock_platform):
+        mock_platform.system.return_value = 'win32'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('cls',))
+        self.assertEquals(mock_os.system.call_args[0], ('cls',))
 
-        mock_sys.platform = 'win64'
+        mock_platform.system.return_value = 'win64'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('cls',))
+        self.assertEquals(mock_os.system.call_args[0], ('cls',))
 
-        mock_sys.platform = 'notwin'
+        mock_platform.system.return_value = 'Darwin'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('clear',))
+        self.assertEquals(mock_os.system.call_args[0], ('clear',))
+
+        mock_platform.system.return_value = 'unknown'
+        clear_screen()
+        self.assertEquals(mock_os.system.call_args[0], ('clear',))
 
 
     @patch('rerun.time')
-    @patch('rerun.sys')
-    def assert_main(self, mock_process_command_line, mock_sys, mock_time):
+    def run_main_loop(self, mock_process_command_line, mock_time):
         # make time.sleep raise a DieError so that we can end the 'while True'
         # loop in main()
         class DieError(AssertionError):
@@ -172,36 +154,53 @@ class Test_Rerun(TestCase):
             raise DieError()
 
         mock_time.sleep = mock_sleep
+        args = [1, 2, 3]
 
         with self.assertRaises(DieError):
-            main()
+            main(args)
 
         self.assertEquals(
             mock_process_command_line.call_args[0][0],
-            mock_sys.argv
+            args
         )
 
 
-    @patch('rerun.any_files_changed')
+    @patch('rerun.changed_files')
     @patch('rerun.clear_screen')
     @patch('rerun.process_command_line')
     @patch('rerun.os.system')
-    def test_main(
+    def test_main_no_changes(
         self, mock_system, mock_process_command_line, mock_clear_screen,
-        mock_any_files_changed
+        mock_changed_files
     ):
-        mock_process_command_line.return_value = 'command'
+        mock_process_command_line.return_value = Mock()
+        mock_changed_files.return_value = []
 
-        mock_any_files_changed.return_value = False
-        self.assert_main(mock_process_command_line)
+        self.run_main_loop(mock_process_command_line)
+
         self.assertFalse(mock_clear_screen.called)
         self.assertFalse(mock_system.called)
 
-        mock_any_files_changed.return_value = True
-        self.assert_main(mock_process_command_line)
-        self.assertTrue(mock_clear_screen.called)
-        self.assertEquals(mock_system.call_args[0], ('command',))
 
+    @patch('rerun.sys.stdout', Mock()) # silence stdout while running test
+    @patch('rerun.changed_files')
+    @patch('rerun.clear_screen')
+    @patch('rerun.process_command_line')
+    @patch('rerun.os.system')
+    def test_main_with_changes(
+        self, mock_system, mock_process_command_line, mock_clear_screen,
+        mock_changed_files
+    ):
+        mock_process_command_line.return_value = Mock()
+        mock_changed_files.return_value = ['x']
+
+        self.run_main_loop(mock_process_command_line)
+
+        self.assertTrue(mock_clear_screen.called)
+        self.assertEquals(
+            mock_system.call_args[0],
+            (mock_process_command_line.return_value.command,)
+        )
 
 
 if __name__ == '__main__':

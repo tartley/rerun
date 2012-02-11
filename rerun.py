@@ -60,11 +60,8 @@ def process_command_line(argv, **_):
     return options
 
 
-def get_file_stats(filename):
-    stats = os.stat(filename)
-    size = stats[stat.ST_SIZE]
-    modification_time = stats[stat.ST_MTIME]
-    return size, modification_time
+def get_file_mtime(filename):
+    return os.stat(filename)[stat.ST_MTIME]
 
 
 def skip_dirs(dirs, skips):
@@ -75,23 +72,23 @@ def skip_dirs(dirs, skips):
 
 def skip_file(filename, ignoreds):
     return (
-        any(os.path.normpath(filename) == ignored for ignored in ignoreds) or
+        any(os.path.normpath(filename).endswith(i) for i in ignoreds) or
         any(filename.endswith(skip) for skip in SKIP_EXT)
     )
 
 
-file_stats = {}
+file_stat_cache = {}
 
 def has_file_changed(filename):
     '''
     Has the given file changed since last invocation?
     '''
-    size, mtime = get_file_stats(filename)
+    mtime = get_file_mtime(filename)
     if (
-        filename not in file_stats or
-        file_stats[filename] != (size, mtime)
+        filename not in file_stat_cache or
+        file_stat_cache[filename] != mtime
     ):
-        file_stats[filename] = (size, mtime)
+        file_stat_cache[filename] = mtime
         return True
     return False
 
@@ -115,14 +112,14 @@ def changed_files(ignoreds):
 
 
 def clear_screen():
-    if platform.system() == 'Darwin':
-        os.system('clear')
-    else:
+    if platform.system().startswith('win'):
         os.system('cls')
+    else:
+        os.system('clear')
 
 
-def main():
-    options = process_command_line(sys.argv[1:])
+def main(args):
+    options = process_command_line(args)
     while True:
         changed = changed_files(options.ignoreds)
         if changed:
@@ -134,5 +131,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main( sys.argv[1:] )
 
