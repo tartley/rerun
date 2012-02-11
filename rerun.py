@@ -39,7 +39,7 @@ class Options(object):
     ignoreds = SKIP_DIRS
 
 
-def process_command_line(argv):
+def process_command_line(argv, **_):
     options = Options()
 
     while argv:
@@ -94,7 +94,7 @@ def has_file_changed(filename):
         file_stats[filename] = (size, mtime)
         return True
     return False
- 
+
 
 def changed_files(ignoreds):
     '''
