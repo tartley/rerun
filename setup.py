@@ -45,12 +45,6 @@ def get_data_files(dest, source):
 def get_sdist_config():
     description, long_description = read_description('README')
 
-    # Make data files always install to the same location as source. Without
-    # this, 'pip install' puts data files in the root of the virtualenv, which
-    # means LICENSE and README files are far away from the installed source.
-    for scheme in INSTALL_SCHEMES.values():
-        scheme['data'] = scheme['purelib']
-
     return dict(
         name=NAME,
         version=VERSION,
@@ -73,10 +67,9 @@ def get_sdist_config():
         #exclude_package_data={
             #'package.subpackage': ['globs']
         #},
-        data_files=[
+        #data_files=[
             # ('install-dir', ['files-relative-to-setup.py']),
-            (NAME, ['LICENSE', 'README']),
-        ], 
+        #], 
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
             #'Development Status :: 1 - Planning',
