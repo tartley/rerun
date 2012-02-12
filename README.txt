@@ -6,7 +6,13 @@ Usage
 
 ::
 
-    rerun [command]
+    rerun [options] <command>
+
+where 'options' may include::
+
+    --verbose|-v        List changed files before <command> output
+    --ignore|-i <D>     Directory or filename to ignore. Changes to this file
+                        do not trigger another execution of <command>.
 
 e.g::
 
@@ -16,13 +22,8 @@ will rerun your tests every time you save your source code. Handy for seeing
 the new test results in a console window after you hit 'save' in your editor,
 without having to change window focus.
 
-For options, see::
-
-    rerun --help
-
 It detects changes to files by polling file modification times once per second.
-On detecting any changes, it clears the terminal and then reruns the given
-command once.
+On detecting any changes, it clears the terminal and reruns the given command.
 
 Polling for modification times perhaps isn't ideal. Registering of OS-specific
 notifications of file system events might be better. In practice though, I
