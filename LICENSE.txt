@@ -1,8 +1,5 @@
 Copyright (c) 2010 Jonathan Hartley <tartley@tartley.com>
-
-Released under the New BSD license (reproduced below.) Alternatively you may
-use this software under any OSI approved open source license of your choice,
-such as those at http://opensource.org/licenses/alphabetical
+Released under the New BSD license (reproduced below.)
 
 - - -
 
