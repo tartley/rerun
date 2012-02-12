@@ -1,58 +1,65 @@
-RERUN
+Re-run command-line every time any files are updated in the current directory
+or its subdirectories.
 
-    http://bitbucket.org/tartley/rerun
+Usage
+=====
 
-    Tested on WindowsXP, Windows 7, MacOSX, and Ubuntu
-    Runs under Python2.7 or 3.2.
-
-USAGE
+::
 
     rerun [command]
 
-    e.g::
+e.g::
 
-        rerun python -m unittest mypackage.mymodule
+    rerun python -m unittest mypackage.mymodule
 
-    will rerun your tests every time you save your source code.
+will rerun your tests every time you save your source code. Handy for seeing
+the new test results in a console window after you hit 'save' in your editor,
+without having to change window focus.
 
-DESCRIPTION
+For options, see::
 
-    A command-line Python script to re-run the given command whenever it
-    detects changes to any file in the current directory or its
-    subdirectories.
+    rerun --help
 
-    Rerun requires that Python is installed and on the PATH.
+It detects changes to files by polling file modification times once per second.
+On detecting any changes, it clears the terminal and then reruns the given
+command once.
 
-    It detects changes to files by polling once per second. On each poll, it
-    walks the files in the current directory and all recursive subdirs. For
-    each file, it checks the size and modification time. On detecting any
-    changes, it clears the terminal and then reruns the given command once.
+It ignores directories called .svn, .git, .hg, .bzr, build and dist.
+It ignores files ending with .pyc or .pyo.
 
-    It ignores directories called .svn, .git, .hg, .bzr, build and dist.
-    It ignores files ending with .pyc or .pyo.
 
-INSTALL
+Dependencies
+============
 
-    On most operating systems, just copy or symlink the script somewhere on
-    your PATH, e.g::
-    
-        ln -s path/to/rerun.py ~/bin/rerun
+Tested on WindowsXP, Windows 7, MacOSX, and Ubuntu.
 
-    On Windows, you might need to associate the .py extension with your Python
-    executable, so you can run by typing "rerun.py" instead of
-    "python rerun.py". If you add '.py' to your PATHEXT environment variable,
-    then you can run by typing just "rerun".
+Runs under Python2.7 or 3.2.
 
-THANKS
+No other dependencies.
 
-    The idea came from the bash command 'watch', and inspiration for this
-    improved implementation came from an old blog post by Jeff Winkler, whos
-    website http://jeffwinkler.net seems to have now died.
 
-CONTACT
+Install
+=======
 
-    I'd love to hear about it if you have problems with this script, or ideas
-    on how it could be better.
+::
 
-    Jonathan Hartley, tartley@tartley.com
+    pip install rerun
+
+See Also
+========
+
+Polling for modification times isn't ideal, but in practice I haven't noticed
+it burden my machine in project directories containing hundreds of files.
+
+Thanks
+======
+
+The idea came from the bash command 'watch', and inspiration for this
+implementation came from an old blog post by Jeff Winkler, whos website
+http://jeffwinkler.net seems to have now died.
+
+Contact
+=======
+
+Jonathan Hartley, tartley@tartley.com
 

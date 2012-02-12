@@ -21,17 +21,17 @@ clean:
 .PHONY: clean
 
 
-# sdist: clean
-# 	python setup.py sdist --formats=zip,gztar
-# .PHONY: sdist
-# 
-# register: clean
-# 	python setup.py sdist --formats=zip,gztar register 
-# .PHONY: release
-# 
-# upload: clean
-# 	python setup.py sdist --formats=zip,gztar register upload
-# .PHONY: release
+sdist: clean
+	python setup.py sdist --formats=zip,gztar
+.PHONY: sdist
+
+register: clean
+	python setup.py sdist --formats=zip,gztar register 
+.PHONY: release
+ 
+upload: clean
+	python setup.py sdist --formats=zip,gztar register upload
+.PHONY: release
 
 
 # runsnake is a GUI visualiser for the output of cProfile
