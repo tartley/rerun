@@ -10,6 +10,7 @@ See README for details.
 import os
 import platform
 import stat
+from subprocess import call
 import sys
 import time
 
@@ -110,9 +111,9 @@ def changed_files(ignoreds):
 
 def clear_screen():
     if platform.system().startswith('win'):
-        os.system('cls')
+        call('cls')
     else:
-        os.system('clear')
+        call('clear')
 
 
 def main(args=None):
@@ -123,6 +124,10 @@ def main(args=None):
             clear_screen()
             if options.verbose:
                 print('\n'.join(changed))
-            os.system(options.command)
+            call(options.command, shell=True)
         time.sleep(1)
+
+
+if __name__ == '__main__':
+    main()
 

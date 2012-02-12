@@ -5,12 +5,11 @@ from os.path import join
 from pprint import pprint
 import sys
 
+from setuptools import setup, find_packages
+
 
 NAME = 'rerun'
-module = importlib.import_module(NAME)
-VERSION= module.VERSION
-SCRIPT = None
-CONSOLE = False
+VERSION= importlib.import_module(NAME).VERSION
 
 
 def read_description(filename):
@@ -43,7 +42,6 @@ def get_data_files(dest, source):
 
 
 def get_sdist_config():
-    from setuptools import find_packages
     description, long_description = read_description('README.txt')
     return dict(
         name=NAME,
@@ -56,13 +54,11 @@ def get_sdist_config():
         author_email='tartley@tartley.com',
         keywords='console command-line development testing tests',
         entry_points = {
-            'console_scripts': [
-                'rerun = rerun.main:main',
-            ],
-            'gui_scripts' : [],
+            'console_scripts': ['rerun = rerun.main:main'],
+            'gui_scripts': [],
         },
         packages=find_packages(exclude=('*.tests',)),
-        #data_files=get_data_files('share/doc/gloopy', 'docs/html'),
+        #data_files=get_data_files('share/doc/rerun', 'docs/html'),
         #package_data={
             #NAME:
                 #get_package_data('data') +
@@ -81,7 +77,6 @@ def get_sdist_config():
             #'Intended Audience :: End Users/Desktop',
             'License :: OSI Approved :: BSD License',
             'Natural Language :: English',
-            #'Operating System :: Microsoft :: Windows',
             #'Operating System :: Microsoft :: Windows :: Windows NT/2000',
             'Operating System :: MacOS :: MacOS X',
             #'Operating System :: POSIX :: Linux',
@@ -95,11 +90,6 @@ def get_sdist_config():
 
 
 def main():
-    # these imports inside main() so that other scripts can import this file
-    # cheaply, to get at its module-level constants like NAME
-    
-    from setuptools import setup
-
     config = get_sdist_config()
 
     if '--verbose' in sys.argv:

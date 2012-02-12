@@ -123,23 +123,23 @@ class Test_Rerun(TestCase):
 
 
     @patch('rerun.main.platform')
-    @patch('rerun.main.os')
-    def test_clear_screen(self, mock_os, mock_platform):
+    @patch('rerun.main.call')
+    def test_clear_screen(self, mock_call, mock_platform):
         mock_platform.system.return_value = 'win32'
         clear_screen()
-        self.assertEquals(mock_os.system.call_args[0], ('cls',))
+        self.assertEquals(mock_call.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'win64'
         clear_screen()
-        self.assertEquals(mock_os.system.call_args[0], ('cls',))
+        self.assertEquals(mock_call.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'Darwin'
         clear_screen()
-        self.assertEquals(mock_os.system.call_args[0], ('clear',))
+        self.assertEquals(mock_call.call_args[0], ('clear',))
 
         mock_platform.system.return_value = 'unknown'
         clear_screen()
-        self.assertEquals(mock_os.system.call_args[0], ('clear',))
+        self.assertEquals(mock_call.call_args[0], ('clear',))
 
 
     @patch('rerun.main.time')
@@ -186,9 +186,9 @@ class Test_Rerun(TestCase):
     @patch('rerun.main.changed_files')
     @patch('rerun.main.clear_screen')
     @patch('rerun.main.process_command_line')
-    @patch('rerun.main.os.system')
+    @patch('rerun.main.call')
     def test_main_with_changes(
-        self, mock_system, mock_process_command_line, mock_clear_screen,
+        self, mock_call, mock_process_command_line, mock_clear_screen,
         mock_changed_files
     ):
         mock_process_command_line.return_value = Mock()
@@ -198,11 +198,7 @@ class Test_Rerun(TestCase):
 
         self.assertTrue(mock_clear_screen.called)
         self.assertEquals(
-            mock_system.call_args[0],
+            mock_call.call_args[0],
             (mock_process_command_line.return_value.command,)
         )
-
-
-if __name__ == '__main__':
-    unittest_main()
 

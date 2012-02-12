@@ -8,7 +8,7 @@ test:
 .PHONY: test
 
 pylint:
-	pylint rerun.py
+	pylint *.py
 .PHONY: pylint
 
 tags:
