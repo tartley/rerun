@@ -1,4 +1,7 @@
-Re-run the given command every time any files under the current directory are
+Rerun
+=====
+
+Re-run the given command every time files under the current directory are
 updated.
 
 Usage

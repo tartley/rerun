@@ -14,12 +14,12 @@ VERSION= importlib.import_module(NAME).VERSION
 
 def read_description(filename):
     '''
-    Read given textfile and return (first_para, rest_of_document)
+    Read given textfile and return (2nd_para, 3rd_para to end)
     '''
     with open(filename) as fp:
         text = fp.read()
     paras = text.split('\n\n')
-    return paras[0], '\n\n'.join(paras[1:])
+    return paras[1], '\n\n'.join(paras[2:])
 
 
 def get_package_data(topdir, excluded=set()):
@@ -42,7 +42,7 @@ def get_data_files(dest, source):
 
 
 def get_sdist_config():
-    description, long_description = read_description('README.txt')
+    description, long_description = read_description('README')
     return dict(
         name=NAME,
         version=VERSION,
@@ -58,13 +58,10 @@ def get_sdist_config():
             'gui_scripts': [],
         },
         packages=find_packages(exclude=('*.tests',)),
-        #data_files=get_data_files('share/doc/rerun', 'docs/html'),
-        #package_data={
-            #NAME:
-                #get_package_data('data') +
-                #['examples/*.py']
-        #},
+        include_package_data=True,
+        # package_data={ NAME: get_package_data('data') },
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
+        # data_files=get_data_files('share/doc/rerun', 'docs/html'),
         classifiers=[
             #'Development Status :: 1 - Planning',
             #'Development Status :: 2 - Pre-Alpha',
