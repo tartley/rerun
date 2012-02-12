@@ -13,6 +13,7 @@ import stat
 import sys
 import time
 
+VERSION = '1.0.0-rc'
 USAGE = '''
 rerun [<options>] <command>
 
