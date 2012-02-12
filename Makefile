@@ -21,6 +21,11 @@ clean:
 .PHONY: clean
 
 
+# create executable entry points in our python or virtualenv's bin dir
+develop:
+	python setup.py develop
+.PHONY: develop
+
 sdist: clean
 	python setup.py sdist --formats=zip,gztar
 .PHONY: sdist

@@ -65,10 +65,13 @@ def get_sdist_config():
             'gui_scripts': [],
         },
         packages=find_packages(exclude=('*.tests',)),
-        # include_package_data=True,
-        # package_data={ 
-            # 'mypackage.subpackage': ['globs'],
-            # NAME: get_package_data('data')
+        #include_package_data=True,
+        #package_data={
+            #'package.subpackage': ['globs'],
+            #NAME: get_package_data('data')
+        #},
+        #exclude_package_data={
+            #'package.subpackage': ['globs']
         #},
         data_files=[
             # ('install-dir', ['files-relative-to-setup.py']),
@@ -96,7 +99,7 @@ def get_sdist_config():
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.2',
             'Programming Language :: Python :: Implementation :: CPython',
-        ],    
+        ],
     )
 
 
