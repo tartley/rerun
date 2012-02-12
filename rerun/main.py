@@ -1,4 +1,3 @@
-#!/usr/bin/env python2.7
 '''
 rerun <command>
 
@@ -7,6 +6,7 @@ whenever it finds any.
 
 See README for details.
 '''
+import argparse
 import os
 import platform
 import stat

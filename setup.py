@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.7
 from glob import glob
 import importlib
 import os
