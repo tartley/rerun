@@ -93,6 +93,7 @@ def get_sdist_config():
             'Programming Language :: Python :: 3.2',
             'Programming Language :: Python :: Implementation :: CPython',
         ],
+        zip_safe=True,
     )
 
 
