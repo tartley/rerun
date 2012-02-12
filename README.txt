@@ -24,6 +24,11 @@ It detects changes to files by polling file modification times once per second.
 On detecting any changes, it clears the terminal and then reruns the given
 command once.
 
+Polling for modification times perhaps isn't ideal. Registering of OS-specific
+notifications of file system events might be better. In practice though, I
+haven't noticed it burden my machine, even in project directories containing
+hundreds of files.
+
 It ignores directories called .svn, .git, .hg, .bzr, build and dist.
 It ignores files ending with .pyc or .pyo.
 
@@ -45,11 +50,6 @@ Install
 
     pip install rerun
 
-See Also
-========
-
-Polling for modification times isn't ideal, but in practice I haven't noticed
-it burden my machine in project directories containing hundreds of files.
 
 Thanks
 ======
