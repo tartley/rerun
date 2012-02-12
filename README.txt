@@ -1,5 +1,5 @@
-Re-run command-line every time any files are updated in the current directory
-or its subdirectories.
+Re-run the given command every time any files under the current directory are
+updated.
 
 Usage
 =====
@@ -54,7 +54,7 @@ Install
 Thanks
 ======
 
-The idea came from the bash command 'watch', and inspiration for this
+The idea came from the Bash command 'watch', and inspiration for this
 implementation came from an old blog post by Jeff Winkler, whos website
 http://jeffwinkler.net seems to have now died.
 
