@@ -8,8 +8,9 @@ import sys
 from distutils.command.install import INSTALL_SCHEMES
 from setuptools import setup, find_packages
 
-
-VERSION= importlib.import_module('rerun').VERSION
+NAME = 'rerun'
+VERSION = importlib.import_module(NAME).VERSION
+README = 'README'
 
 
 def read_description(filename):
@@ -24,11 +25,11 @@ def read_description(filename):
 
 def get_package_data(topdir, excluded=set()):
     retval = []
-    for dirname, subdirs, files in os.walk(join('rerun', topdir)):
+    for dirname, subdirs, files in os.walk(join(NAME, topdir)):
         for x in excluded:
             if x in subdirs:
                 subdirs.remove(x)
-        retval.append(join(dirname[len('rerun') + 1:], '*.*'))
+        retval.append(join(dirname[len(NAME) + 1:], '*.*'))
     return retval
 
 
@@ -45,13 +46,13 @@ def get_sdist_config():
     description, long_description = read_description('README')
 
     # Make data files always install to the same location as source. Without
-    # this, 'pip install' puts data files in the root of the virtualenv.
-    # This is to make the LICENSE file install next to the source.
+    # this, 'pip install' puts data files in the root of the virtualenv, which
+    # means LICENSE and README files are far away from the installed source.
     for scheme in INSTALL_SCHEMES.values():
         scheme['data'] = scheme['purelib']
 
     return dict(
-        name='rerun',
+        name=NAME,
         version=VERSION,
         description=description,
         long_description=long_description,
@@ -60,18 +61,18 @@ def get_sdist_config():
         author_email='tartley@tartley.com',
         keywords='console command-line development testing tests',
         entry_points = {
-            'console_scripts': ['rerun = rerun.main:main'],
+            'console_scripts': ['%s = %s.main:main' % (NAME, NAME)],
             'gui_scripts': [],
         },
         packages=find_packages(exclude=('*.tests',)),
         # include_package_data=True,
         # package_data={ 
             # 'mypackage.subpackage': ['globs'],
-            # 'rerun': get_package_data('data')
+            # NAME: get_package_data('data')
         #},
         data_files=[
             # ('install-dir', ['files-relative-to-setup.py']),
-            ('rerun', ['LICENSE']),
+            (NAME, ['LICENSE', 'README']),
         ], 
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
