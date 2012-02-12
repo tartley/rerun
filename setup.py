@@ -55,7 +55,12 @@ def get_sdist_config():
         author='Jonathan Hartley',
         author_email='tartley@tartley.com',
         keywords='console command-line development testing tests',
-        scripts=['rerun.py'],
+        entry_points = {
+            'console_scripts': [
+                'rerun = rerun.main:main',
+            ],
+            'gui_scripts' : [],
+        },
         packages=find_packages(exclude=('*.tests',)),
         #data_files=get_data_files('share/doc/gloopy', 'docs/html'),
         #package_data={

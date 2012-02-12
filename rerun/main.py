@@ -13,7 +13,6 @@ import stat
 import sys
 import time
 
-VERSION = '1.0.0-rc'
 USAGE = '''
 rerun [<options>] <command>
 
@@ -116,8 +115,8 @@ def clear_screen():
         os.system('clear')
 
 
-def main(args):
-    options = process_command_line(args)
+def main(args=None):
+    options = process_command_line(args or sys.argv[1:])
     while True:
         changed = changed_files(options.ignoreds)
         if changed:
@@ -126,8 +125,4 @@ def main(args):
                 print('\n'.join(changed))
             os.system(options.command)
         time.sleep(1)
-
-
-if __name__ == '__main__':
-    main( sys.argv[1:] )
 

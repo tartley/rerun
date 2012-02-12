@@ -4,7 +4,7 @@ from unittest import TestCase, main as unittest_main
 
 from mock import Mock, patch
 
-from rerun import (
+from rerun.main import (
     changed_files, clear_screen, get_file_mtime, has_file_changed, main,
     skip_dirs, SKIP_EXT, skip_file,
 )
@@ -12,7 +12,7 @@ from rerun import (
 
 class Test_Rerun(TestCase):
 
-    @patch('rerun.os')
+    @patch('rerun.main.os')
     def test_get_file_stats(self, mock_os):
         def mock_stat(filename):
             self.assertEquals(filename, 'hello')
@@ -47,7 +47,7 @@ class Test_Rerun(TestCase):
         self.assertTrue(skip_file('h' + SKIP_EXT[0], []))
 
 
-    @patch('rerun.get_file_mtime')
+    @patch('rerun.main.get_file_mtime')
     def test_has_file_changed_return_value(self, mock_get_file_stats):
         file_stats = ['mon', 'mon', 'tue', 'tue']
         mock_get_file_stats.side_effect = lambda _: file_stats.pop(0)
@@ -58,9 +58,9 @@ class Test_Rerun(TestCase):
         self.assertFalse(has_file_changed('filename'))
 
 
-    @patch('rerun.skip_file')
-    @patch('rerun.has_file_changed')
-    @patch('rerun.os')
+    @patch('rerun.main.skip_file')
+    @patch('rerun.main.has_file_changed')
+    @patch('rerun.main.os')
     def test_changed_files(self, mock_os, mock_changed, mock_skip):
         mock_os.walk.return_value = [
             ('root1', list('dirs1'), list('files')),
@@ -80,9 +80,9 @@ class Test_Rerun(TestCase):
         self.assertEquals(mock_changed.call_count, 5)
 
 
-    @patch('rerun.skip_file')
-    @patch('rerun.has_file_changed')
-    @patch('rerun.os')
+    @patch('rerun.main.skip_file')
+    @patch('rerun.main.has_file_changed')
+    @patch('rerun.main.os')
     def test_changed_files_skips_files(self, mock_os, mock_changed, mock_skip):
         mock_os.walk.return_value = [
             ('root1', list('dirs1'), list('files')),
@@ -102,8 +102,8 @@ class Test_Rerun(TestCase):
         self.assertEquals(mock_changed.call_count, 5)
 
 
-    @patch('rerun.os')
-    @patch('rerun.skip_dirs')
+    @patch('rerun.main.os')
+    @patch('rerun.main.skip_dirs')
     def test_changed_files_calls_skip_dirs(self, mock_skip_dirs, mock_os):
         mock_os.walk.return_value = [
             ('root1', list('dirs1'), list('files')),
@@ -122,8 +122,8 @@ class Test_Rerun(TestCase):
         )
 
 
-    @patch('rerun.platform')
-    @patch('rerun.os')
+    @patch('rerun.main.platform')
+    @patch('rerun.main.os')
     def test_clear_screen(self, mock_os, mock_platform):
         mock_platform.system.return_value = 'win32'
         clear_screen()
@@ -142,7 +142,7 @@ class Test_Rerun(TestCase):
         self.assertEquals(mock_os.system.call_args[0], ('clear',))
 
 
-    @patch('rerun.time')
+    @patch('rerun.main.time')
     def run_main_loop(self, mock_process_command_line, mock_time):
         # make time.sleep raise a DieError so that we can end the 'while True'
         # loop in main()
@@ -165,10 +165,10 @@ class Test_Rerun(TestCase):
         )
 
 
-    @patch('rerun.changed_files')
-    @patch('rerun.clear_screen')
-    @patch('rerun.process_command_line')
-    @patch('rerun.os.system')
+    @patch('rerun.main.changed_files')
+    @patch('rerun.main.clear_screen')
+    @patch('rerun.main.process_command_line')
+    @patch('rerun.main.os.system')
     def test_main_no_changes(
         self, mock_system, mock_process_command_line, mock_clear_screen,
         mock_changed_files
@@ -182,11 +182,11 @@ class Test_Rerun(TestCase):
         self.assertFalse(mock_system.called)
 
 
-    @patch('rerun.sys.stdout', Mock()) # silence stdout while running test
-    @patch('rerun.changed_files')
-    @patch('rerun.clear_screen')
-    @patch('rerun.process_command_line')
-    @patch('rerun.os.system')
+    @patch('rerun.main.sys.stdout', Mock()) # silence stdout while running test
+    @patch('rerun.main.changed_files')
+    @patch('rerun.main.clear_screen')
+    @patch('rerun.main.process_command_line')
+    @patch('rerun.main.os.system')
     def test_main_with_changes(
         self, mock_system, mock_process_command_line, mock_clear_screen,
         mock_changed_files

@@ -4,7 +4,7 @@
 # the PATH.
 
 test:
-	python -m unittest discover tests
+	python -m unittest discover rerun/tests
 .PHONY: test
 
 pylint:
