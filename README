@@ -33,8 +33,8 @@ notifications of file system events might be better. In practice though, I
 haven't noticed it burden my machine, even in project directories containing
 hundreds of files.
 
-It ignores directories called .svn, .git, .hg, .bzr, build and dist.
-It ignores files ending with .pyc or .pyo.
+It always ignores directories called .svn, .git, .hg, .bzr, build and dist.
+It always ignores files ending with .pyc or .pyo.
 
 
 Dependencies
