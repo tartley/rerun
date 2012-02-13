@@ -1,4 +1,3 @@
-* use argparse
 * argparse description should come from __init__.__doc__
 * argparse --version should come from __init__.VERSION
 * argparse 'useage' output should be used to create the README

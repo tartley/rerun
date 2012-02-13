@@ -1,16 +1,79 @@
 from os.path import join
 import stat
-from unittest import TestCase, main as unittest_main
+from unittest import TestCase
 
 from mock import Mock, patch
 
+from rerun import VERSION
 from rerun.main import (
-    changed_files, clear_screen, get_file_mtime, has_file_changed, main,
-    skip_dirs, SKIP_EXT, skip_file,
+    changed_files, clear_screen, get_file_mtime, get_parser, has_file_changed,
+    main, mainloop, parse_command_line, skip_dirs, SKIP_EXT, skip_file,
 )
 
 
 class Test_Rerun(TestCase):
+
+    @patch('sys.stderr')
+    def assert_get_parser_error(self, args, expected, mock_stderr):
+        parser = get_parser()
+        with self.assertRaises(SystemExit):
+            parser.parse_args(args)
+        self.assertIn(expected, mock_stderr.write.call_args[0][0])
+
+
+    def test_get_parser_no_args(self):
+        self.assert_get_parser_error([], 'error: too few arguments')
+
+
+    def test_get_parser_version(self):
+        self.assert_get_parser_error(['--version'], 'v%s' % (VERSION,))
+
+
+    def test_get_parser_command(self):
+        parser = get_parser()
+        options = parser.parse_args('command is this'.split())
+        self.assertEqual(options.command, ['command', 'is', 'this'])
+
+
+    def test_get_parser_verbose(self):
+        parser = get_parser()
+        options = parser.parse_args('--verbose command is this'.split())
+        self.assertTrue(options.verbose)
+        self.assertEqual(options.command, ['command', 'is', 'this'])
+
+
+    def test_get_parser_ignore(self):
+        parser = get_parser()
+        parser.exit = Mock()
+        options = parser.parse_args('--ignore abc command is this'.split())
+        self.assertEqual(options.ignore, ['abc'])
+        self.assertEqual(options.command, ['command', 'is', 'this'])
+
+
+    def test_get_parser_ignore_default(self):
+        parser = get_parser()
+        options = parser.parse_args('command is this'.split())
+        self.assertEqual(options.ignore, [])
+
+
+    def test_get_parser_ignore_multiple(self):
+        parser = get_parser()
+        options = parser.parse_args(
+            '--ignore abc --ignore def command is this'.split())
+        self.assertEqual(options.ignore, ['abc', 'def'])
+        self.assertEqual(options.command, ['command', 'is', 'this'])
+
+
+    def test_parse_command_line(self):
+        parser = Mock()
+        options = parser.parse_args.return_value
+        options.command = 'this is a command'.split()
+
+        parse_command_line(parser, tuple('abc'))
+
+        self.assertEqual(parser.parse_args.call_args, ((tuple('abc'),),))
+        self.assertEqual(options.command, 'this is a command')
+
 
     @patch('rerun.main.os')
     def test_get_file_stats(self, mock_os):
@@ -37,6 +100,10 @@ class Test_Rerun(TestCase):
 
     def test_skip_file_for_ignored(self):
         self.assertTrue(skip_file('h.txt', ['h.txt']))
+
+
+    def test_skip_file_for_ignored_with_same_ending(self):
+        self.assertFalse(skip_file('gh.txt', ['h.txt']))
 
 
     def test_skip_file_works_on_basename(self):
@@ -123,82 +190,83 @@ class Test_Rerun(TestCase):
 
 
     @patch('rerun.main.platform')
-    @patch('rerun.main.call')
-    def test_clear_screen(self, mock_call, mock_platform):
+    @patch('rerun.main.subprocess')
+    def test_clear_screen(self, mock_subprocess, mock_platform):
         mock_platform.system.return_value = 'win32'
         clear_screen()
-        self.assertEquals(mock_call.call_args[0], ('cls',))
+        self.assertEquals(mock_subprocess.call.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'win64'
         clear_screen()
-        self.assertEquals(mock_call.call_args[0], ('cls',))
+        self.assertEquals(mock_subprocess.call.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'Darwin'
         clear_screen()
-        self.assertEquals(mock_call.call_args[0], ('clear',))
+        self.assertEquals(mock_subprocess.call.call_args[0], ('clear',))
 
         mock_platform.system.return_value = 'unknown'
         clear_screen()
-        self.assertEquals(mock_call.call_args[0], ('clear',))
+        self.assertEquals(mock_subprocess.call.call_args[0], ('clear',))
 
 
     @patch('rerun.main.time')
-    def run_main_loop(self, mock_process_command_line, mock_time):
-        # make time.sleep raise a DieError so that we can end the 'while True'
-        # loop in main()
-        class DieError(AssertionError):
-            pass
+    def run_mainloop(self, mock_time):
 
+        # make time.sleep raise StopIteration so that we can end the
+        # 'while True' loop in main()
         def mock_sleep(seconds):
             self.assertEquals(seconds, 1)
-            raise DieError()
+            raise StopIteration()
 
         mock_time.sleep = mock_sleep
-        args = [1, 2, 3]
+        options = Mock()
 
-        with self.assertRaises(DieError):
-            main(args)
-
-        self.assertEquals(
-            mock_process_command_line.call_args[0][0],
-            args
-        )
+        with self.assertRaises(StopIteration):
+            mainloop(options)
 
 
     @patch('rerun.main.changed_files')
     @patch('rerun.main.clear_screen')
-    @patch('rerun.main.process_command_line')
-    @patch('rerun.main.os.system')
-    def test_main_no_changes(
-        self, mock_system, mock_process_command_line, mock_clear_screen,
-        mock_changed_files
+    @patch('rerun.main.subprocess')
+    def test_mainloop_no_changes(
+        self, mock_subprocess, mock_clear_screen, mock_changed_files,
     ):
-        mock_process_command_line.return_value = Mock()
         mock_changed_files.return_value = []
 
-        self.run_main_loop(mock_process_command_line)
+        self.run_mainloop()
 
         self.assertFalse(mock_clear_screen.called)
-        self.assertFalse(mock_system.called)
+        self.assertFalse(mock_subprocess.call.called)
 
 
-    @patch('rerun.main.sys.stdout', Mock()) # silence stdout while running test
     @patch('rerun.main.changed_files')
     @patch('rerun.main.clear_screen')
-    @patch('rerun.main.process_command_line')
-    @patch('rerun.main.call')
-    def test_main_with_changes(
-        self, mock_call, mock_process_command_line, mock_clear_screen,
-        mock_changed_files
+    @patch('rerun.main.subprocess')
+    def test_mainloop_with_changes(
+        self, mock_subprocess, mock_clear_screen, mock_changed_files,
     ):
-        mock_process_command_line.return_value = Mock()
-        mock_changed_files.return_value = ['x']
+        mock_changed_files.return_value = ['somefile']
 
-        self.run_main_loop(mock_process_command_line)
+        self.run_mainloop()
 
         self.assertTrue(mock_clear_screen.called)
-        self.assertEquals(
-            mock_call.call_args[0],
-            (mock_process_command_line.return_value.command,)
+        self.assertTrue(mock_subprocess.call.called)
+
+
+    @patch('rerun.main.sys.argv', [1, 2, 3])
+    @patch('rerun.main.get_parser')
+    @patch('rerun.main.parse_command_line')
+    @patch('rerun.main.mainloop')
+    def test_main(self, mock_mainloop, mock_parse, mock_get_parser):
+
+        main()
+
+        self.assertEqual(
+            mock_parse.call_args,
+            ((mock_get_parser.return_value, [2, 3]), )
+        )
+        self.assertEqual(
+            mock_mainloop.call_args,
+            ((mock_parse.return_value,), )
         )
 

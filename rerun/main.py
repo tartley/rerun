@@ -10,9 +10,11 @@ import argparse
 import os
 import platform
 import stat
-from subprocess import call
 import sys
+import subprocess
 import time
+
+from . import VERSION
 
 USAGE = '''
 rerun [<options>] <command>
@@ -30,31 +32,34 @@ Options may contain:
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
 
+HELP_COMMAND = '''\
+Command to execute
+'''
+HELP_VERBOSE = '''\
+Display the names of changed files before the command output.
+'''
+HELP_IGNORE = '''\
+File or directory to ignore. Any directories of the given name (and
+their subdirs) are excluded from the search for changed files. Any modification
+to files of the given name are ignored. The given value is compared to
+basenames, so for example, "--ignore=def" will skip the contents of directory
+"abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.'''
 
-class Options(object):
-    command = None
-    verbose = None
-    ignoreds = SKIP_DIRS
+
+def get_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command', nargs='+', help=HELP_COMMAND)
+    parser.add_argument('--verbose',
+        default=False, action='store_true', help=HELP_VERBOSE)
+    parser.add_argument('--ignore', action='append', default=[], help=HELP_IGNORE)
+    parser.add_argument('--version',
+        action='version', version='%(prog)s v' + VERSION)
+    return parser
 
 
-def process_command_line(argv, **_):
-    options = Options()
-
-    while argv:
-        if argv[0] in ['--verbose', '-v']:
-            options.verbose = True
-            argv = argv[1:]
-        elif argv[0] in ['--ignore', '-i']:
-            options.ignoreds.append(argv[1])
-            argv = argv[2:]
-        else:
-            break
-
-    if not argv:
-        sys.exit(USAGE)
-
-    options.command = ' '.join(argv)
-
+def parse_command_line(parser, args):
+    options = parser.parse_args(args)
+    options.command = ' '.join(options.command)
     return options
 
 
@@ -70,7 +75,7 @@ def skip_dirs(dirs, skips):
 
 def skip_file(filename, ignoreds):
     return (
-        any(os.path.normpath(filename).endswith(i) for i in ignoreds) or
+        any(os.path.basename(filename) == i for i in ignoreds) or
         any(filename.endswith(skip) for skip in SKIP_EXT)
     )
 
@@ -111,23 +116,26 @@ def changed_files(ignoreds):
 
 def clear_screen():
     if platform.system().startswith('win'):
-        call('cls')
+        subprocess.call('cls')
     else:
-        call('clear')
+        subprocess.call('clear')
 
 
-def main(args=None):
-    options = process_command_line(args or sys.argv[1:])
+def mainloop(options):
+    first_time = True
     while True:
-        changed = changed_files(options.ignoreds)
+        changed = changed_files(options.ignore)
         if changed:
             clear_screen()
-            if options.verbose:
+            if options.verbose and not first_time:
                 print('\n'.join(changed))
-            call(options.command, shell=True)
+            subprocess.call(options.command, shell=True)
         time.sleep(1)
+        first_time = False
 
 
-if __name__ == '__main__':
-    main()
+def main():
+    mainloop(
+        parse_command_line( get_parser(), sys.argv[1:] )
+    )
 
