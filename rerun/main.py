@@ -1,6 +1,6 @@
 '''
-Polls for changes to any file under the current directory or its subdirectories.
-Whenever it finds any, clears the screen and re-runs <command>.
+Reruns 'command' whenever any files in the current directory or its
+subdirectories are modified.
 '''
 import argparse
 import os
@@ -29,16 +29,17 @@ basenames, so for example, "--ignore=def" will skip the contents of directory
 "abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.'''
 
 
-def get_description():
+def get_epilog():
     return '\n'.join([
-        __doc__,
         'Always ignores directories ' + ', '.join(SKIP_DIRS),
-        'Always ignores files with extensions ' + ', '.join(SKIP_EXT)
+        'Always ignores files with extensions ' + ', '.join(SKIP_EXT),
+        '',
+        'Version ' + VERSION,
     ])
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description=get_description(),
+        description=__doc__, epilog=get_epilog(),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--verbose', '-v',
