@@ -1,5 +1,6 @@
 * argparse description should come from __init__.__doc__
 * argparse --version should come from __init__.VERSION
+* argparse description shoudl end with version number
 * argparse 'useage' output should be used to create the README
 * make "pydoc rerun" work
 * upload doc (readme?) to read the docs

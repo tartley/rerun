@@ -4,6 +4,10 @@ rerun <command>
 Polls for changes to any file under the current directory and runs <command>
 whenever it finds any.
 
+Clears the screen and runs the given command whenever files change in the
+current directory or subdirectories. Works by polling every second for file
+modification time or size changes.
+
 See README for details.
 '''
 import argparse
@@ -15,19 +19,6 @@ import subprocess
 import time
 
 from . import VERSION
-
-USAGE = '''
-rerun [<options>] <command>
-
-Clears the screen and runs the given command whenever files change in the
-current directory or subdirectories. Works by polling every second for file
-modification time or size changes.
-
-Options may contain:
-
-    --verbose|-v     List changed files before <command> output.
-    --ignore|-i <d>  Directory to ignore
-'''
 
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
@@ -48,12 +39,13 @@ basenames, so for example, "--ignore=def" will skip the contents of directory
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', nargs='+', help=HELP_COMMAND)
-    parser.add_argument('--verbose',
+    parser.add_argument('--verbose', '-v',
         default=False, action='store_true', help=HELP_VERBOSE)
-    parser.add_argument('--ignore', action='append', default=[], help=HELP_IGNORE)
+    parser.add_argument('--ignore', '-i',
+        action='append', default=[], help=HELP_IGNORE)
     parser.add_argument('--version',
         action='version', version='%(prog)s v' + VERSION)
+    parser.add_argument('command', nargs='+', help=HELP_COMMAND)
     return parser
 
 

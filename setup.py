@@ -6,7 +6,6 @@ from os.path import join
 from pprint import pprint
 import sys
 
-from distutils.command.install import INSTALL_SCHEMES
 from setuptools import setup, find_packages
 
 NAME = 'rerun'
