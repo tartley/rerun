@@ -1,7 +1,3 @@
-'''
-Reruns the given command every time files are modified in the current directory
-or its subdirectories.
-'''
 import argparse
 import os
 import platform
@@ -10,7 +6,7 @@ import sys
 import subprocess
 import time
 
-from version import __version__
+from . import __doc__, __version__
 
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']

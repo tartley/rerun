@@ -1,8 +1,8 @@
 Rerun
 =====
 
-Re-run the given command every time files are modified in the current directory
-or its subdirectories.
+Command-line executable to re-run the given command every time files are
+modified in the current directory or its subdirectories.
 
 Usage
 =====
