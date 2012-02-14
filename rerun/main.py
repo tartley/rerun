@@ -1,6 +1,6 @@
 '''
-Reruns 'command' whenever any files in the current directory or its
-subdirectories are modified.
+Reruns the given command every time files are modified in the current directory
+or its subdirectories.
 '''
 import argparse
 import os
@@ -31,6 +31,8 @@ basenames, so for example, "--ignore=def" will skip the contents of directory
 EPILOG = '''\
 Always ignores directories: {}
 Always ignores files with extensions: {}
+
+Documentation & downloads: http://pypi.python.org/pypi/%(prog)s/
 
 Version {}\
 '''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), VERSION)

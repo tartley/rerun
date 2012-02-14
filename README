@@ -1,8 +1,8 @@
 Rerun
 =====
 
-Re-run the given command every time files under the current directory are
-updated.
+Re-run the given command every time files are modified in the current directory
+or its subdirectories.
 
 Usage
 =====
@@ -11,15 +11,10 @@ Usage
 
     rerun [--help|-h] [--verbose|-v] [--ignore|-i=<file>] [--version] <command>
 
-Positional arguments::
+Where::
 
-    <command>               Command to execute
-
-Optional arguments::
-
+    <command>           Command to execute
     --help|-h           Show this help message and exit.
-    --verbose|-v        Display the names of changed files before the command
-                        output.
     --ignore|-i=<file>  File or directory to ignore. Any directories of the
                         given name (and their subdirs) are excluded from the
                         search for changed files. Any modification to files of
@@ -28,14 +23,16 @@ Optional arguments::
                         will skip the contents of directory "abc/def/" and
                         will ignore file "/ghi/def". Can be specified multiple
                         times.
-    --version           Show program's version number and exit.
+    --verbose|-v        Display the names of changed files before the command
+                        output.
+    --version           Show version number and exit.
 
 Description
 ===========
 
 Rerun detects changes to files by polling file modification times once per
-second. On detecting any changes, it clears the terminal and reruns the given
-command.
+second. It looks in the current directory and all its subdirectories. On
+detecting any changes, it clears the terminal and reruns the given command.
 
 It always ignores directories called .svn, .git, .hg, .bzr, build and dist.
 
@@ -45,9 +42,11 @@ e.g::
 
     rerun python -m unittest mypackage.mymodule
 
-will rerun your tests every time you save your source code. Handy for seeing
-the new test results in a console window after you hit 'save' in your editor,
-without having to change window focus.
+will rerun your tests every time you save your source code, but it won't
+rerun the tests a second time when .pyo files get updated as a result of
+executing the tests. Handy for seeing the new test results in another console
+window after you hit 'save' in your editor, without having to change window
+focus.
 
 Dependencies
 ============
@@ -75,12 +74,16 @@ notifications of file system events might be better. In practice though, I
 haven't noticed it burden my machine in directories containing hundreds of
 files.
 
+It might be handy if '--ignore' accepted globs, e.g. "\*.tmp"
+
+See issues at https://bitbucket.org/tartley/rerun/issues?status=new&status=open
+
 Alternatives
 ============
 
 PyPI package 'watchdog' is a cross-platform library for handling file-system
-events, with which the authors have built script watchmedo, which looks like
-a more serious and heavy-duty version of 'rerun'.
+events, which includes script 'watchmedo', which looks like a more serious and
+heavy-duty version of 'Rerun'.
 
 Thanks
 ======
@@ -92,5 +95,12 @@ http://jeffwinkler.net seems to have now died.
 Contact
 =======
 
-Jonathan Hartley, tartley@tartley.com, twitter: @tartley.
+:Documentation & download:
+    http://pypi.python.org/pypi/rerun/
+
+:Souce code and issues:
+    https://bitbucket.org/tartley/rerun
+
+:Contact the author:
+    Jonathan Hartley, email: tartley at domain tartley.com, twitter: tartley.
 

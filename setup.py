@@ -50,7 +50,7 @@ def get_sdist_config():
         version=VERSION,
         description=description,
         long_description=long_description,
-        url='http://bitbucket.org/tartley/gloopy',
+        url='http://pypi.python.org/pypi/%s/' % (NAME,),
         author='Jonathan Hartley',
         author_email='tartley@tartley.com',
         keywords='console command-line development testing tests',
