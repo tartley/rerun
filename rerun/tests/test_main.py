@@ -4,10 +4,9 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from rerun import __version__
 from rerun.main import (
-    changed_files, clear_screen, get_file_mtime, get_parser, has_file_changed,
-    main, mainloop, skip_dirs, SKIP_EXT, skip_file,
+    __version__, changed_files, clear_screen, get_file_mtime, get_parser,
+    has_file_changed, main, mainloop, skip_dirs, SKIP_EXT, skip_file,
 )
 
 

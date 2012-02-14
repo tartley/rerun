@@ -10,7 +10,7 @@ import sys
 import subprocess
 import time
 
-from . import __version__
+from version import __version__
 
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
