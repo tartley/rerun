@@ -60,9 +60,9 @@ def skip_dirs(dirs, skips):
             dirs.remove(skip)
 
 
-def skip_file(filename, ignoreds):
+def skip_file(filename, ignores):
     return (
-        any(os.path.basename(filename) == i for i in ignoreds) or
+        any(os.path.basename(filename) == i for i in ignores) or
         any(filename.endswith(skip) for skip in SKIP_EXT)
     )
 
@@ -83,17 +83,17 @@ def has_file_changed(filename):
     return False
 
 
-def changed_files(ignoreds):
+def changed_files(ignores):
     '''
     Walks subdirs of cwd, looking for files which have changed since last
     invokation.
     '''
     changed = []
     for root, dirs, files in os.walk('.'):
-        skip_dirs(dirs, ignoreds)
+        skip_dirs(dirs, ignores)
         for filename in files:
             fullname = os.path.join(root, filename)
-            if skip_file(fullname, ignoreds):
+            if skip_file(fullname, ignores):
                 continue
             if has_file_changed(fullname):
                 changed.append(fullname)
