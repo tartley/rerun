@@ -2,13 +2,14 @@
 from glob import glob
 import os
 from os.path import join
+import re
 
 from setuptools import setup, find_packages
 
-from rerun import __version__
+# this file should not import from our local source
+
 
 NAME = 'rerun'
-README = 'README'
 
 
 def read_description(filename):
@@ -19,6 +20,24 @@ def read_description(filename):
         text = fp.read()
     paras = text.split('\n\n')
     return paras[1], '\n\n'.join(paras[2:])
+
+
+def read_version(filename):
+    '''
+    Manually parse the version string so that we don't have to import anything
+    from local source, which (along with its dependencies) will not always be
+    present, e.g. setuptools must install our dependencies first, but can't
+    know what they are until after it has run this setup.py.
+    '''
+    with open(filename, "rt") as filehandle:
+        content = filehandle.read()
+    match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]$", content, re.M)
+    if match:
+        return match.group(1)
+    else:
+        raise RuntimeError(
+            "Can't read version from %s:\n%s" % (filename, content)
+        )
 
 
 def get_package_data(topdir, excluded=set()):
@@ -42,10 +61,9 @@ def get_data_files(dest, source):
 
 def get_sdist_config():
     description, long_description = read_description('README')
-
     return dict(
         name=NAME,
-        version=__version__,
+        version=read_version(join(NAME, 'version.py')),
         description=description,
         long_description=long_description,
         url='http://pypi.python.org/pypi/%s/' % (NAME,),
