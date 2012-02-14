@@ -28,19 +28,17 @@ to files of the given name are ignored. The given value is compared to
 basenames, so for example, "--ignore=def" will skip the contents of directory
 "abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.'''
 
+EPILOG = '''\
+Always ignores directories {}
+Always ignores files with extensions {}
 
-def get_epilog():
-    return '\n'.join([
-        'Always ignores directories ' + ', '.join(SKIP_DIRS),
-        'Always ignores files with extensions ' + ', '.join(SKIP_EXT),
-        '',
-        'Version ' + VERSION,
-    ])
+Version {}'''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), VERSION)
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description=__doc__, epilog=get_epilog(),
+        description=__doc__,
+        epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--verbose', '-v',
