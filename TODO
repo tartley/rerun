@@ -1,4 +1,3 @@
-* argparse 'useage' output should be used to create the README
 * make "pydoc rerun" work
 * upload doc (readme?) to read the docs
 * use py2app

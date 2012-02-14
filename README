@@ -9,13 +9,37 @@ Usage
 
 ::
 
-    rerun [options] <command>
+    rerun [--help|-h] [--verbose|-v] [--ignore|-i=<file>] [--version] <command>
 
-where 'options' may include::
+Positional arguments::
 
-    --verbose|-v        List changed files before <command> output
-    --ignore|-i <D>     Directory or filename to ignore. Changes to this file
-                        do not trigger another execution of <command>.
+    <command>               Command to execute
+
+Optional arguments::
+
+    --help|-h           Show this help message and exit.
+    --verbose|-v        Display the names of changed files before the command
+                        output.
+    --ignore|-i=<file>  File or directory to ignore. Any directories of the
+                        given name (and their subdirs) are excluded from the
+                        search for changed files. Any modification to files of
+                        the given name are ignored. The given value is
+                        compared to basenames, so for example, "--ignore=def"
+                        will skip the contents of directory "abc/def/" and
+                        will ignore file "/ghi/def". Can be specified multiple
+                        times.
+    --version           Show program's version number and exit.
+
+Description
+===========
+
+Rerun detects changes to files by polling file modification times once per
+second. On detecting any changes, it clears the terminal and reruns the given
+command.
+
+It always ignores directories called .svn, .git, .hg, .bzr, build and dist.
+
+It always ignores files ending with .pyc or .pyo.
 
 e.g::
 
@@ -25,27 +49,16 @@ will rerun your tests every time you save your source code. Handy for seeing
 the new test results in a console window after you hit 'save' in your editor,
 without having to change window focus.
 
-It detects changes to files by polling file modification times once per second.
-On detecting any changes, it clears the terminal and reruns the given command.
-
-Polling for modification times perhaps isn't ideal. Registering of OS-specific
-notifications of file system events might be better. In practice though, I
-haven't noticed it burden my machine, even in project directories containing
-hundreds of files.
-
-It always ignores directories called .svn, .git, .hg, .bzr, build and dist.
-It always ignores files ending with .pyc or .pyo.
-
-
 Dependencies
 ============
 
-Tested on WindowsXP, Windows 7, MacOSX, and Ubuntu.
+Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
 Runs under Python2.7 or 3.2.
 
-No other dependencies.
+May run under Python 2.6 or older with PyPI package 'argparse' installed.
 
+No other dependencies.
 
 Install
 =======
@@ -54,6 +67,20 @@ Install
 
     pip install rerun
 
+Known Problems
+==============
+
+Polling for modification times perhaps isn't ideal. Registering of OS-specific
+notifications of file system events might be better. In practice though, I
+haven't noticed it burden my machine in directories containing hundreds of
+files.
+
+Alternatives
+============
+
+PyPI package 'watchdog' is a cross-platform library for handling file-system
+events, with which the authors have built script watchmedo, which looks like
+a more serious and heavy-duty version of 'rerun'.
 
 Thanks
 ======
@@ -65,5 +92,5 @@ http://jeffwinkler.net seems to have now died.
 Contact
 =======
 
-Jonathan Hartley, tartley@tartley.com
+Jonathan Hartley, tartley@tartley.com, twitter: @tartley.
 

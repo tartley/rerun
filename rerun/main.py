@@ -29,10 +29,11 @@ basenames, so for example, "--ignore=def" will skip the contents of directory
 "abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.'''
 
 EPILOG = '''\
-Always ignores directories {}
-Always ignores files with extensions {}
+Always ignores directories: {}
+Always ignores files with extensions: {}
 
-Version {}'''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), VERSION)
+Version {}\
+'''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), VERSION)
 
 
 def get_parser():
