@@ -37,6 +37,7 @@ def get_epilog():
         'Version ' + VERSION,
     ])
 
+
 def get_parser():
     parser = argparse.ArgumentParser(
         description=__doc__, epilog=get_epilog(),
@@ -50,12 +51,6 @@ def get_parser():
         action='version', version='%(prog)s v' + VERSION)
     parser.add_argument('command', nargs='+', help=HELP_COMMAND)
     return parser
-
-
-def parse_command_line(parser, args):
-    options = parser.parse_args(args)
-    options.command = ' '.join(options.command)
-    return options
 
 
 def get_file_mtime(filename):
@@ -124,13 +119,11 @@ def mainloop(options):
             clear_screen()
             if options.verbose and not first_time:
                 print('\n'.join(changed))
-            subprocess.call(options.command, shell=True)
+            subprocess.call(options.command)
         time.sleep(1)
         first_time = False
 
 
 def main():
-    mainloop(
-        parse_command_line( get_parser(), sys.argv[1:] )
-    )
+    mainloop( get_parser().parse_args( sys.argv[1:] ) )
 

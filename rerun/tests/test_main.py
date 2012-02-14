@@ -7,7 +7,7 @@ from mock import Mock, patch
 from rerun import VERSION
 from rerun.main import (
     changed_files, clear_screen, get_file_mtime, get_parser, has_file_changed,
-    main, mainloop, parse_command_line, skip_dirs, SKIP_EXT, skip_file,
+    main, mainloop, skip_dirs, SKIP_EXT, skip_file,
 )
 
 
@@ -62,17 +62,6 @@ class Test_Rerun(TestCase):
             '--ignore abc --ignore def command is this'.split())
         self.assertEqual(options.ignore, ['abc', 'def'])
         self.assertEqual(options.command, ['command', 'is', 'this'])
-
-
-    def test_parse_command_line(self):
-        parser = Mock()
-        options = parser.parse_args.return_value
-        options.command = 'this is a command'.split()
-
-        parse_command_line(parser, tuple('abc'))
-
-        self.assertEqual(parser.parse_args.call_args, ((tuple('abc'),),))
-        self.assertEqual(options.command, 'this is a command')
 
 
     @patch('rerun.main.os')
@@ -255,18 +244,15 @@ class Test_Rerun(TestCase):
 
     @patch('rerun.main.sys.argv', [1, 2, 3])
     @patch('rerun.main.get_parser')
-    @patch('rerun.main.parse_command_line')
     @patch('rerun.main.mainloop')
-    def test_main(self, mock_mainloop, mock_parse, mock_get_parser):
+    def test_main(self, mock_mainloop, mock_get_parser):
 
         main()
 
-        self.assertEqual(
-            mock_parse.call_args,
-            ((mock_get_parser.return_value, [2, 3]), )
-        )
+        parse_args = mock_get_parser.return_value.parse_args
+        self.assertEqual(parse_args.call_args, (([2, 3],), ))
         self.assertEqual(
             mock_mainloop.call_args,
-            ((mock_parse.return_value,), )
+            ((parse_args.return_value,),)
         )
 
