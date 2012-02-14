@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from rerun import VERSION
+from rerun import __version__
 from rerun.main import (
     changed_files, clear_screen, get_file_mtime, get_parser, has_file_changed,
     main, mainloop, skip_dirs, SKIP_EXT, skip_file,
@@ -26,7 +26,7 @@ class Test_Rerun(TestCase):
 
 
     def test_get_parser_version(self):
-        self.assert_get_parser_error(['--version'], 'v%s' % (VERSION,))
+        self.assert_get_parser_error(['--version'], 'v%s' % (__version__,))
 
 
     def test_get_parser_command(self):

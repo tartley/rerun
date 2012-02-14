@@ -9,7 +9,7 @@ import sys
 from setuptools import setup, find_packages
 
 NAME = 'rerun'
-VERSION = importlib.import_module(NAME).VERSION
+from rerun import __version__
 README = 'README'
 
 
@@ -47,7 +47,7 @@ def get_sdist_config():
 
     return dict(
         name=NAME,
-        version=VERSION,
+        version=__version__,
         description=description,
         long_description=long_description,
         url='http://pypi.python.org/pypi/%s/' % (NAME,),

@@ -10,7 +10,7 @@ import sys
 import subprocess
 import time
 
-from . import VERSION
+from . import __version__
 
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
@@ -35,7 +35,7 @@ Always ignores files with extensions: {}
 Documentation & downloads: http://pypi.python.org/pypi/%(prog)s/
 
 Version {}\
-'''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), VERSION)
+'''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), __version__)
 
 
 def get_parser():
@@ -49,7 +49,7 @@ def get_parser():
     parser.add_argument('--ignore', '-i',
         action='append', default=[], help=HELP_IGNORE)
     parser.add_argument('--version',
-        action='version', version='%(prog)s v' + VERSION)
+        action='version', version='%(prog)s v' + __version__)
     parser.add_argument('command', nargs='+', help=HELP_COMMAND)
     return parser
 
