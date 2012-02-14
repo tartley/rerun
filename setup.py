@@ -1,15 +1,13 @@
 #!/usr/bin/env python2.7
 from glob import glob
-import importlib
 import os
 from os.path import join
-from pprint import pprint
-import sys
 
 from setuptools import setup, find_packages
 
-NAME = 'rerun'
 from rerun import __version__
+
+NAME = 'rerun'
 README = 'README'
 
 
@@ -97,17 +95,6 @@ def get_sdist_config():
     )
 
 
-def main():
-    config = get_sdist_config()
-
-    if '--verbose' in sys.argv:
-        pprint(config)
-    if '--dry-run' in sys.argv:
-        return
-
-    setup(**config)
-
-
 if __name__ == '__main__':
-    main()
+    setup(**get_sdist_config())
 
