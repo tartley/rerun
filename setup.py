@@ -3,6 +3,7 @@ from glob import glob
 import os
 from os.path import join
 import re
+import sys
 
 from setuptools import setup, find_packages
 
@@ -61,6 +62,11 @@ def get_data_files(dest, source):
 
 def get_sdist_config():
     description, long_description = read_description('README')
+
+    install_requires = []
+    if sys.version_info < (2, 7):
+        install_requires.append("argparse >= 1.2.1")
+
     return dict(
         name=NAME,
         version=read_version(join(NAME, 'version.py')),
@@ -74,6 +80,7 @@ def get_sdist_config():
             'console_scripts': ['%s = %s.main:main' % (NAME, NAME)],
             'gui_scripts': [],
         },
+        install_requires=install_requires,
         packages=find_packages(exclude=('*.tests',)),
         #include_package_data=True,
         #package_data={
