@@ -1,3 +1,4 @@
+* fails for "rerun command --command-args" (tries to interpret '--command-args' as if it was a rerun option)
 * change implementation to get changed files then filter out ignoreds.
 * --ignore should accept globs. This would allow combination of SKIP_DIR
   and SKIP_EXT into single 'IGNORES' list.

@@ -6,7 +6,8 @@ from mock import Mock, patch
 
 from rerun.main import (
     __version__, changed_files, clear_screen, get_file_mtime, get_parser,
-    has_file_changed, main, mainloop, skip_dirs, SKIP_EXT, skip_file,
+    has_file_changed, main, mainloop, parse_args, skip_dirs, SKIP_EXT,
+    skip_file, validate
 )
 
 
@@ -20,10 +21,6 @@ class Test_Rerun(TestCase):
         self.assertIn(expected, mock_stderr.write.call_args[0][0])
 
 
-    def test_get_parser_no_args(self):
-        self.assert_get_parser_error([], 'error: too few arguments')
-
-
     def test_get_parser_version(self):
         self.assert_get_parser_error(['--version'], 'v%s' % (__version__,))
 
@@ -32,6 +29,12 @@ class Test_Rerun(TestCase):
         parser = get_parser()
         options = parser.parse_args('command is this'.split())
         self.assertEqual(options.command, ['command', 'is', 'this'])
+
+
+    def test_get_parser_command_with_options_in_it(self):
+        parser = get_parser()
+        options = parser.parse_args('ls --color'.split())
+        self.assertEqual(options.command, ['ls', '--color'])
 
 
     def test_get_parser_verbose(self):
@@ -61,6 +64,31 @@ class Test_Rerun(TestCase):
             '--ignore abc --ignore def command is this'.split())
         self.assertEqual(options.ignore, ['abc', 'def'])
         self.assertEqual(options.command, ['command', 'is', 'this'])
+
+
+    def test_parse_args(self):
+        parser = Mock()
+        args = Mock()
+
+        options = parse_args(parser, args)
+
+        self.assertEqual(parser.parse_args.call_args, ((args,),))
+        self.assertEqual(options, parser.parse_args.return_value)
+
+
+    def test_validate(self):
+        options = Mock()
+        options.command = [0]
+        response = validate(options)
+        self.assertIs(response, options)
+
+
+    @patch('rerun.main._exit')
+    def test_validate_requires_command(self, mock_exit):
+        options = Mock()
+        options.command = []
+        validate(options)
+        self.assertEqual(mock_exit.call_args, (('No command specified.',), ))
 
 
     @patch('rerun.main.os')
@@ -243,15 +271,26 @@ class Test_Rerun(TestCase):
 
     @patch('rerun.main.sys.argv', [1, 2, 3])
     @patch('rerun.main.get_parser')
+    @patch('rerun.main.parse_args')
+    @patch('rerun.main.validate')
     @patch('rerun.main.mainloop')
-    def test_main(self, mock_mainloop, mock_get_parser):
+    def test_main(
+        self, mock_mainloop, mock_validate, mock_parse_args, mock_get_parser
+    ):
 
         main()
 
-        parse_args = mock_get_parser.return_value.parse_args
-        self.assertEqual(parse_args.call_args, (([2, 3],), ))
+        self.assertEqual(mock_get_parser.call_args, ((), ))
+        self.assertEqual(
+            mock_parse_args.call_args,
+            ((mock_get_parser.return_value, [2, 3]),)
+        )
+        self.assertEqual(
+            mock_validate.call_args,
+            ((mock_parse_args.return_value, ),)
+        )
         self.assertEqual(
             mock_mainloop.call_args,
-            ((parse_args.return_value,),)
+            ((mock_validate.return_value, ),)
         )
 

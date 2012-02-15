@@ -11,26 +11,29 @@ from . import __doc__, __version__
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
 
-HELP_COMMAND = '''\
-Command to execute
+HELP_COMMAND = '''
+Command to execute. The first command line arg that rerun doesn't recognise
+(including anything that doesn't start with '-') marks the start of the command.
+All args from there onwards are considered to be part of the given command,
+even if they match args that rerun recognises (e.g. -v.)
 '''
-HELP_VERBOSE = '''\
+HELP_VERBOSE = '''
 Display the names of changed files before the command output.
 '''
-HELP_IGNORE = '''\
+HELP_IGNORE = '''
 File or directory to ignore. Any directories of the given name (and
 their subdirs) are excluded from the search for changed files. Any modification
 to files of the given name are ignored. The given value is compared to
 basenames, so for example, "--ignore=def" will skip the contents of directory
-"abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.'''
-
-EPILOG = '''\
+"abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.
+'''
+EPILOG = '''
 Always ignores directories: {}
 Always ignores files with extensions: {}
 
 Documentation & downloads: http://pypi.python.org/pypi/%(prog)s/
 
-Version {}\
+Version {}
 '''.format(', '.join(SKIP_DIRS), ', '.join(SKIP_EXT), __version__)
 
 
@@ -40,14 +43,30 @@ def get_parser():
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument('--color')
     parser.add_argument('--verbose', '-v',
         default=False, action='store_true', help=HELP_VERBOSE)
     parser.add_argument('--ignore', '-i',
         action='append', default=[], help=HELP_IGNORE)
     parser.add_argument('--version',
         action='version', version='%(prog)s v' + __version__)
-    parser.add_argument('command', nargs='+', help=HELP_COMMAND)
+    parser.add_argument('command', nargs=argparse.REMAINDER, help=HELP_COMMAND)
     return parser
+
+
+def parse_args(parser, args):
+    return parser.parse_args(args)
+
+
+def _exit(message):
+    sys.stderr.write(message + '\n')
+    sys.exit(2)
+
+
+def validate(options):
+    if len(options.command) == 0:
+        _exit('No command specified.')
+    return options
 
 
 def get_file_mtime(filename):
@@ -115,12 +134,18 @@ def mainloop(options):
         if changed:
             clear_screen()
             if options.verbose and not first_time:
-                print('\n'.join(changed))
+                print('\n'.join(sorted(changed)))
             subprocess.call(options.command)
         time.sleep(1)
         first_time = False
 
 
 def main():
-    mainloop( get_parser().parse_args( sys.argv[1:] ) )
+    mainloop(
+        validate(
+            parse_args(
+                get_parser(), sys.argv[1:]
+            )
+        )
+    )
 
