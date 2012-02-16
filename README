@@ -20,8 +20,8 @@ Where::
                         search for changed files. Any modification to files of
                         the given name are ignored. The given value is
                         compared to basenames, so for example, "--ignore=def"
-                        will skip the contents of directory "abc/def/" and
-                        will ignore file "/ghi/def". Can be specified multiple
+                        will skip the contents of directory "./abc/def/" and
+                        will ignore file "./ghi/def". Can be specified multiple
                         times.
     --verbose|-v        Display the names of changed files before the command
                         output.
