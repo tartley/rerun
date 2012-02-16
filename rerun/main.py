@@ -27,7 +27,7 @@ File or directory to ignore. Any directories of the given name (and
 their subdirs) are excluded from the search for changed files. Any modification
 to files of the given name are ignored. The given value is compared to
 basenames, so for example, "--ignore=def" will skip the contents of directory
-"abc/def/" and will ignore file "/ghi/def". Can be specified multiple times.
+"./abc/def/" and will ignore file "./ghi/def". Can be specified multiple times.
 '''
 EPILOG = '''
 Always ignores directories: {}
