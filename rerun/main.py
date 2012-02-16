@@ -1,5 +1,4 @@
 import argparse
-import functools
 import itertools
 import os
 import platform
@@ -45,7 +44,6 @@ def get_parser():
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument('--color')
     parser.add_argument('--verbose', '-v',
         default=False, action='store_true', help=HELP_VERBOSE)
     parser.add_argument('--ignore', '-i',
