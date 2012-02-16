@@ -1,10 +1,6 @@
-* fails for "rerun command --command-args" (tries to interpret '--command-args' as if it was a rerun option)
-* change implementation to get changed files then filter out ignoreds.
-* --ignore should accept globs. This would allow combination of SKIP_DIR
-  and SKIP_EXT into single 'IGNORES' list.
-* upload doc (readme?) to read the docs
 * use py2app, create an OSX binary.
 * use py2exe, create a Windows binary.
 * create a Linux binary.
 * bundle Linux binary into a deb or rpm
+* upload docs to read the docs
 

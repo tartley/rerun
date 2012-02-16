@@ -1,4 +1,6 @@
 import argparse
+import functools
+import itertools
 import os
 import platform
 import stat
@@ -15,7 +17,7 @@ HELP_COMMAND = '''
 Command to execute. The first command line arg that rerun doesn't recognise
 (including anything that doesn't start with '-') marks the start of the command.
 All args from there onwards are considered to be part of the given command,
-even if they match args that rerun recognises (e.g. -v.)
+even if they look like args that rerun would otherwise recognise, e.g. -v.
 '''
 HELP_VERBOSE = '''
 Display the names of changed files before the command output.
@@ -69,6 +71,16 @@ def validate(options):
     return options
 
 
+def is_ignorable(filename, ignores):
+    '''
+    Returns True if filename is in 'ignores' or ends with a SKIP_EXT
+    '''
+    return (
+        any(os.path.basename(filename) == i for i in ignores) or
+        any(filename.endswith(skip) for skip in SKIP_EXT)
+    )
+
+
 def get_file_mtime(filename):
     return os.stat(filename)[stat.ST_MTIME]
 
@@ -77,13 +89,6 @@ def skip_dirs(dirs, skips):
     for skip in skips:
         if skip in dirs:
             dirs.remove(skip)
-
-
-def skip_file(filename, ignores):
-    return (
-        any(os.path.basename(filename) == i for i in ignores) or
-        any(filename.endswith(skip) for skip in SKIP_EXT)
-    )
 
 
 file_stat_cache = {}
@@ -102,22 +107,19 @@ def has_file_changed(filename):
     return False
 
 
-def changed_files(ignores):
+def get_changed_files(ignores):
     '''
     Walks subdirs of cwd, looking for files which have changed since last
     invokation.
     '''
-    changed = []
+    changed_files = []
     for root, dirs, files in os.walk('.'):
         skip_dirs(dirs, ignores)
         for filename in files:
             fullname = os.path.join(root, filename)
-            if skip_file(fullname, ignores):
-                continue
             if has_file_changed(fullname):
-                changed.append(fullname)
-
-    return changed
+                changed_files.append(fullname)
+    return changed_files
 
 
 def clear_screen():
@@ -130,11 +132,14 @@ def clear_screen():
 def mainloop(options):
     first_time = True
     while True:
-        changed = changed_files(options.ignore)
-        if changed:
+        changed_files = list(itertools.ifilterfalse(
+            lambda filename: is_ignorable(filename, options.ignore),
+            get_changed_files(options.ignore)
+        ))
+        if changed_files:
             clear_screen()
             if options.verbose and not first_time:
-                print('\n'.join(sorted(changed)))
+                print('\n'.join(sorted(changed_files)))
             subprocess.call(options.command)
         time.sleep(1)
         first_time = False
