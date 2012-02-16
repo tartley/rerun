@@ -3,4 +3,5 @@
 * create a Linux binary.
 * bundle Linux binary into a deb or rpm
 * upload docs to read the docs
-
+* --ignore should accept globs
+* create a generic Python project template from this
