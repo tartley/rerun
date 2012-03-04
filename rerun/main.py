@@ -144,6 +144,7 @@ def mainloop(options):
 
 
 def main():
+    # setup.py install/develop creates an executable that calls 'main()'
     mainloop(
         validate(
             parse_args(

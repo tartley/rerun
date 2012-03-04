@@ -53,8 +53,7 @@ Dependencies
 
 Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
-Runs under Python2.7 or 3.2.
-
+Tested under Python2.7 or 3.2.
 May run under Python 2.6 or older with PyPI package 'argparse' installed.
 
 No other dependencies.
