@@ -77,7 +77,7 @@ def get_sdist_config():
         author_email='tartley@tartley.com',
         keywords='console command-line development testing tests',
         entry_points = {
-            'console_scripts': ['%s = %s.main:main' % (NAME, NAME)],
+            'console_scripts': ['{0} = {0}.{0}:main'.format(NAME)],
             'gui_scripts': [],
         },
         install_requires=install_requires,

@@ -44,11 +44,11 @@ sdist: clean
 
 register: clean
 	python setup.py sdist --formats=zip,gztar register 
-.PHONY: release
+.PHONY: register
  
 upload: clean
 	python setup.py sdist --formats=zip,gztar register upload
-.PHONY: release
+.PHONY: upload
 
 
 # runsnake is a GUI visualiser for the output of cProfile
