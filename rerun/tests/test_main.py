@@ -156,7 +156,7 @@ class Test_Rerun(TestCase):
 
         actual = get_changed_files([])
 
-        self.assertEqual(actual, ['root1/f', 'root1/s'])
+        self.assertEqual(actual, [join('root1', 'f'), join('root1', 's')])
         # must call has_file_changed for every file, cannot short-circuit
         self.assertEquals(mock_changed.call_count, 5)
 

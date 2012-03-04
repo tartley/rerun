@@ -3,8 +3,11 @@
 # on the PATH, or on Ubuntu, or on WindowsXP/7 with Cygwin binaries foremost on
 # the PATH.
 
+NAME=rerun
+
+
 test:
-	python -m unittest discover rerun/tests
+	python -m unittest discover $(NAME)/tests
 .PHONY: test
 
 pylint:
@@ -20,6 +23,15 @@ clean:
 	find . -name '*.py[oc]' -exec rm {} \;
 .PHONY: clean
 
+
+virtualenv:
+	if [ ! -d $(HOME)/.virtualenvs/$(NAME) ]; then cd ~/.virtualenvs; virtualenv $(NAME); fi
+	# Make tries to run the following in a new bash session, which fails
+	# Even if it could be made to work, we need it to work in current process
+	# so that it can set windows env.vars.
+		# "%HOME%\.virtualenvs\$(NAME)\Scripts\activate"
+	# So there is no point doing the following:
+		# pip install -r requirements_dev.txt
 
 # create executable entry points in our python or virtualenv's bin dir
 develop:
