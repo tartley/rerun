@@ -62,4 +62,6 @@ upload: clean
 # 	rm -rf dist/${NAME}-${RELEASE}.* build
 # 	${PYTHON} setup.py --quiet py2exe
 # .PHONY: py2exe
+# Note that setup.py should not import py2exe at module level
+# this would prevent any setup.py command being used unless py2exe was installed
 

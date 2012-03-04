@@ -7,7 +7,13 @@ import sys
 
 from setuptools import setup, find_packages
 
-# this file should not import from our local source
+# setup.py should not import non-stdlib modules, other than setuptools,
+# at module level, since this prevents any setup.py commands from running
+# unless they were installed. (e.g. installing 'py2exe' should not be required
+# just to do a 'setup.py sdist')
+
+# setup.py should not import from our local source (pip needs to be able to
+# import setup.py before our dependencies have been installed)
 
 
 NAME = 'rerun'
