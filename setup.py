@@ -18,7 +18,6 @@ from setuptools import setup, find_packages
 
 NAME = 'rerun'
 
-
 def read_description(filename):
     '''
     Read given textfile and return (2nd_para, 3rd_para to end)
@@ -126,6 +125,29 @@ def get_sdist_config():
     )
 
 
+def get_py2app_config():
+    # This doeesn't work. When I run the resulting application, it
+    # barfs due to missing stdlib packages 'platform' and 'ctypes'. Adding
+    # 'platform' to 'options.py2app.packages' (below) fixes that error, but
+    # adding 'ctypes' does not. :-(
+    return dict(
+        app=['rerun/rerun.py'],
+        options=dict(
+            py2app=dict(
+                argv_emulation=True,
+                packages=['platform', 'ctypes'],
+            ),
+        ),
+    )
+
+
+def main():
+    config = {}
+    config.update(get_sdist_config())
+    config.update(get_py2app_config())
+    setup(**config)
+
+
 if __name__ == '__main__':
-    setup(**get_sdist_config())
+    main()
 
