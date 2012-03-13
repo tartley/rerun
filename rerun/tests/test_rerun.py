@@ -15,20 +15,20 @@ class Test_Rerun(TestCase):
     @patch('rerun.rerun.os')
     def test_get_file_stats(self, mock_os):
         def mock_stat(filename):
-            self.assertEquals(filename, 'hello')
+            self.assertEqual(filename, 'hello')
             return mock_filestat
         mock_os.stat = mock_stat
         mock_filestat = {stat.ST_MTIME: 'mymtime'}
 
         time = get_file_mtime('hello')
 
-        self.assertEquals(time, 'mymtime')
+        self.assertEqual(time, 'mymtime')
 
 
     def test_skip_dirs_modifies_in_place(self):
         dirs = ['a', 'b', 'c', 'd', 'e', 'f'] 
         skip_dirs(dirs, ['b', 'd', 'f'])
-        self.assertEquals(dirs, ['a', 'c', 'e'])
+        self.assertEqual(dirs, ['a', 'c', 'e'])
 
 
     def test_is_ignorable(self):
@@ -79,7 +79,7 @@ class Test_Rerun(TestCase):
 
         self.assertEqual(actual, [join('root1', 'f'), join('root1', 's')])
         # must call has_file_changed for every file, cannot short-circuit
-        self.assertEquals(mock_changed.call_count, 5)
+        self.assertEqual(mock_changed.call_count, 5)
 
 
     @patch('rerun.rerun.os')
@@ -107,23 +107,23 @@ class Test_Rerun(TestCase):
     def test_clear_screen(self, mock_system, mock_platform):
         mock_platform.system.return_value = 'Windows'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('cls',))
+        self.assertEqual(mock_system.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'win32'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('cls',))
+        self.assertEqual(mock_system.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'win64'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('cls',))
+        self.assertEqual(mock_system.call_args[0], ('cls',))
 
         mock_platform.system.return_value = 'Darwin'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('clear',))
+        self.assertEqual(mock_system.call_args[0], ('clear',))
 
         mock_platform.system.return_value = 'unknown'
         clear_screen()
-        self.assertEquals(mock_system.call_args[0], ('clear',))
+        self.assertEqual(mock_system.call_args[0], ('clear',))
 
 
     @patch('rerun.rerun.time')
@@ -132,7 +132,7 @@ class Test_Rerun(TestCase):
         # make time.sleep raise StopIteration so that we can end the
         # 'while True' loop in main()
         def mock_sleep(seconds):
-            self.assertEquals(seconds, 1)
+            self.assertEqual(seconds, 1)
             raise StopIteration()
 
         mock_time.sleep = mock_sleep

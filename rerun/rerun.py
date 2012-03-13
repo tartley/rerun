@@ -12,6 +12,13 @@ from .options import get_parser, parse_args, validate
 SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
 SKIP_EXT = ['.pyc', '.pyo']
 
+try:
+    # Python2
+    filterfalse = itertools.ifilterfalse
+except AttributeError:
+    # Python3
+    filterfalse = itertools.filterfalse
+
 
 def is_ignorable(filename, ignores):
     '''
@@ -75,7 +82,7 @@ def clear_screen():
 def mainloop(options):
     first_time = True
     while True:
-        changed_files = list(itertools.ifilterfalse(
+        changed_files = list(filterfalse(
             lambda filename: is_ignorable(filename, options.ignore),
             get_changed_files(options.ignore)
         ))
