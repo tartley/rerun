@@ -7,10 +7,10 @@ import sys
 
 from setuptools import setup, find_packages
 
-# setup.py should not import non-stdlib modules, other than setuptools,
-# at module level, since this prevents any setup.py commands from running
-# unless they were installed. (e.g. installing 'py2exe' should not be required
-# just to do a 'setup.py sdist')
+# setup.py should not import non-stdlib modules, other than setuptools, at
+# module level, since this prevents setup.py from running until they are
+# installed. Installing 'py2exe' should not be required just to do a 'setup.py
+# sdist'.
 
 # setup.py should not import from our local source (pip needs to be able to
 # import setup.py before our dependencies have been installed)
@@ -135,7 +135,6 @@ def get_py2app_config():
         options=dict(
             py2app=dict(
                 argv_emulation=True,
-                packages=['platform', 'ctypes'],
             ),
         ),
     )
@@ -144,7 +143,8 @@ def get_py2app_config():
 def main():
     config = {}
     config.update(get_sdist_config())
-    config.update(get_py2app_config())
+    if 'py2app' in sys.argv:
+        config.update(get_py2app_config())
     setup(**config)
 
 
