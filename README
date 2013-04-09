@@ -70,37 +70,7 @@ Install
 Known Problems
 ==============
 
-It barfs on more complex Bash constructions like:
-
-    rerun <rerun-options> ENVVAR=value <executable> <exe-args>
-
-But this can be fixed using:
-
-    ENVVAR=value rerun <rerun-options> <executable> <exe-args>
-
-However, composite commands don't work, e.g:
-
-    rerun <rerun-options> <exe1> | <exe2>
-
-This could be fixed by changing rerun to call subprocess with shell=True, and
-asking users to escape the '|' with a '\'. However, this will then break simple
-constructions like:
-
-    rerun <rerun-options> echo 123
-
-Need to escape the space after 'echo'. Not sure how best to fix all this.
-
-
-Polling for modification times perhaps isn't ideal. Registering of OS-specific
-notifications of file system events might be better. In practice though, I
-haven't noticed it burden my machine in directories containing hundreds of
-files.
-
-
-It might be handy if '--ignore' accepted globs, e.g. "\*.tmp"
-
-
-See issues at https://bitbucket.org/tartley/rerun/issues?status=new&status=open
+See issues at https://bitbucket.org/tartley/rerun/issues
 
 
 Alternatives
