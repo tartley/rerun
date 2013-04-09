@@ -87,6 +87,11 @@ The idea came from the Bash command 'watch', and inspiration for this
 implementation came from an old blog post by Jeff Winkler, whos website
 http://jeffwinkler.net seems to have now died.
 
+Thanks to Bitbucket user sgourley for reporting, chasing up and even
+offering to fix issue #1, an egregious bug in ignoring directories, before
+I finally spotted the error. Thanks for the prods!
+
+
 Contact
 =======
 
