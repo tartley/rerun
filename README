@@ -70,11 +70,7 @@ Install
 Known Problems
 ==============
 
-It only works with simple command lines in the form:
-
-    rerun <rerun-options> <executable> <exe-args>
-
-e.g. it barfs on more complex Bash constructions like:
+It barfs on more complex Bash constructions like:
 
     rerun <rerun-options> ENVVAR=value <executable> <exe-args>
 
@@ -82,12 +78,17 @@ But this can be fixed using:
 
     ENVVAR=value rerun <rerun-options> <executable> <exe-args>
 
-However, composite commands don't work, and don't seem amenable to any fix I
-can think of:
+However, composite commands don't work, e.g:
 
     rerun <rerun-options> <exe1> | <exe2>
 
-I'm not sure how to fix this.
+This could be fixed by changing rerun to call subprocess with shell=True, and
+asking users to escape the '|' with a '\'. However, this will then break simple
+constructions like:
+
+    rerun <rerun-options> echo 123
+
+Need to escape the space after 'echo'. Not sure how best to fix all this.
 
 
 Polling for modification times perhaps isn't ideal. Registering of OS-specific
