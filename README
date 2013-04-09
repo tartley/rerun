@@ -34,9 +34,11 @@ Rerun detects changes to files by polling file modification times once per
 second. It looks in the current directory and all its subdirectories. On
 detecting any changes, it clears the terminal and reruns the given command.
 
-It always ignores directories called .svn, .git, .hg, .bzr, build and dist.
+It always ignores directories called .svn, .git, .hg, .bzr, build and dist,
+unless given --ignore flags for user-specified ignores.
 
-It always ignores files ending with .pyc or .pyo.
+It always ignores files ending with .pyc or .pyo. This isn't currently
+user-overrideable.
 
 e.g::
 
@@ -68,14 +70,37 @@ Install
 Known Problems
 ==============
 
+It only works with simple command lines in the form:
+
+    rerun <rerun-options> <executable> <exe-args>
+
+e.g. it barfs on more complex Bash constructions like:
+
+    rerun <rerun-options> ENVVAR=value <executable> <exe-args>
+
+But this can be fixed using:
+
+    ENVVAR=value rerun <rerun-options> <executable> <exe-args>
+
+However, composite commands don't work, and don't seem amenable to any fix I
+can think of:
+
+    rerun <rerun-options> <exe1> | <exe2>
+
+I'm not sure how to fix this.
+
+
 Polling for modification times perhaps isn't ideal. Registering of OS-specific
 notifications of file system events might be better. In practice though, I
 haven't noticed it burden my machine in directories containing hundreds of
 files.
 
+
 It might be handy if '--ignore' accepted globs, e.g. "\*.tmp"
 
+
 See issues at https://bitbucket.org/tartley/rerun/issues?status=new&status=open
+
 
 Alternatives
 ============
