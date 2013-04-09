@@ -41,7 +41,7 @@ def get_parser(name, skip_dirs, skip_ext):
     parser.add_argument('--verbose', '-v',
         default=False, action='store_true', help=HELP_VERBOSE)
     parser.add_argument('--ignore', '-i',
-        action='append', default=[], help=HELP_IGNORE)
+        action='append', default=skip_dirs, help=HELP_IGNORE)
     parser.add_argument('--version',
         action='version', version='%(prog)s v' + __version__)
     parser.add_argument('command', nargs=argparse.REMAINDER, help=HELP_COMMAND)
