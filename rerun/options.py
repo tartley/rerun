@@ -21,21 +21,24 @@ basenames, so for example, "--ignore=def" will skip the contents of directory
 "./abc/def/" and will ignore file "./ghi/def". Can be specified multiple times.
 '''
 EPILOG = '''
-Always ignores directories: {}
-Always ignores files with extensions: {}
+Always ignores directories: {skip_dirs}
+Always ignores files with extensions: {skip_exts}
 
 Documentation & downloads: http://pypi.python.org/pypi/%(prog)s/
 
-Version {}
+Version {version}
 '''
 
 
-def get_parser(name, skip_dirs, skip_ext):
+def get_parser(name, skip_dirs, skip_exts):
     parser = argparse.ArgumentParser(
         description=__doc__,
         prog=name,
         epilog=EPILOG.format(
-            ', '.join(skip_dirs), ', '.join(skip_ext), __version__),
+            skip_dirs=skip_dirs,
+            skip_exts=skip_exts,
+            version=__version__,
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--verbose', '-v',

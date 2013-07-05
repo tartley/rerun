@@ -1,3 +1,4 @@
-activate
 .tox
+activate
+rerun.egg-info
 
