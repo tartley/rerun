@@ -1,6 +1,9 @@
 from os.path import join
 import stat
-from unittest import TestCase
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from mock import Mock, patch
 
@@ -10,7 +13,7 @@ from rerun.rerun import (
 )
 
 
-class Test_Rerun(TestCase):
+class Test_Rerun(unittest.TestCase):
 
     @patch('rerun.rerun.os')
     def test_get_file_stats(self, mock_os):

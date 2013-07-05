@@ -1,4 +1,7 @@
-from unittest import TestCase
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from mock import Mock, patch
 
@@ -6,7 +9,7 @@ from rerun import __version__
 from rerun.options import get_parser, parse_args, validate
 
 
-class Test_Options(TestCase):
+class Test_Options(unittest.TestCase):
 
     @patch('sys.stderr')
     def assert_get_parser_error(self, args, expected, mock_stderr):
