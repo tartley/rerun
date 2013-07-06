@@ -22,7 +22,7 @@ tags:
 .PHONY: tags
 
 clean:
-	rm -rf build dist MANIFEST
+	rm -rf build dist MANIFEST .tox $(NAME).egg-info
 	find . -name '*.py[oc]' -exec rm {} \;
 .PHONY: clean
 
