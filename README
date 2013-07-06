@@ -55,12 +55,18 @@ Dependencies
 
 Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
-Tested under Python2.7 or 3.2.
+Tested on Python 2.6, 2.7 and 3.3.
 
-Runs on Python 2.6 if argparse is installed, but the tests don't pass due to
-unittest changes.
+Python 2.6 requires argparse to be installed -
+see requirements_2.6.txt.
 
 No other dependencies.
+
+Hacking
+=======
+
+To run tests requires mock, tox. On Python 2.6 also requires unittest2. 
+See requirements_dev.txt and requirements_dev_2.6.txt.
 
 Install
 =======
@@ -103,7 +109,8 @@ I finally spotted the error. Thanks for the prods!
 Changes
 =======
 
-1.0.18 Now runs on Python 2.6 (although the tests don't pass)
+1.0.18 Now runs on Python 2.6, and is tested on Python 3.3.
+
 
 Contact
 =======
