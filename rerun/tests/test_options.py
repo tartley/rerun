@@ -1,4 +1,7 @@
-from unittest import TestCase
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from mock import Mock, patch
 
@@ -6,7 +9,7 @@ from rerun import __version__
 from rerun.options import get_parser, parse_args, validate
 
 
-class Test_Options(TestCase):
+class Test_Options(unittest.TestCase):
 
     @patch('sys.stderr')
     def assert_get_parser_error(self, args, expected, mock_stderr):
@@ -43,21 +46,21 @@ class Test_Options(TestCase):
         parser = get_parser('prog', ['dirs'], ['exts'])
         parser.exit = Mock()
         options = parser.parse_args('--ignore abc command is this'.split())
-        self.assertEqual(options.ignore, ['abc'])
+        self.assertEqual(options.ignore, ['dirs', 'abc'])
         self.assertEqual(options.command, ['command', 'is', 'this'])
 
 
     def test_get_parser_ignore_default(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
         options = parser.parse_args('command is this'.split())
-        self.assertEqual(options.ignore, [])
+        self.assertEqual(options.ignore, ['dirs'])
 
 
     def test_get_parser_ignore_multiple(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
         options = parser.parse_args(
             '--ignore abc --ignore def command is this'.split())
-        self.assertEqual(options.ignore, ['abc', 'def'])
+        self.assertEqual(options.ignore, ['dirs', 'abc', 'def'])
         self.assertEqual(options.command, ['command', 'is', 'this'])
 
 

@@ -55,10 +55,18 @@ Dependencies
 
 Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
-Tested under Python2.7 or 3.2.
-May run under Python 2.6 or older with PyPI package 'argparse' installed.
+Tested on Python 2.6, 2.7 and 3.3.
+
+Python 2.6 requires argparse to be installed -
+see requirements_2.6.txt.
 
 No other dependencies.
+
+Hacking
+=======
+
+To run tests requires mock, tox. On Python 2.6 also requires unittest2. 
+See requirements_dev.txt and requirements_dev_2.6.txt.
 
 Install
 =======
@@ -78,7 +86,13 @@ Alternatives
 
 PyPI package 'watchdog' is a cross-platform library for handling file-system
 events, which includes script 'watchmedo', which looks like a more serious and
-heavy-duty version of 'Rerun'.
+heavy-duty version of 'Rerun'. However it doesn't work for my primary use
+case, which is re-running tests when files are saved by Vim. This is due to the
+way Vim writes to temporary files and then moves the temp file to overwrite
+data atomically. Vim thus guaruntees that the user never loses data, but also
+fails to generate the correct FS events that watchmedo is looking for.
+
+https://pypi.python.org/pypi/watchdog
 
 Thanks
 ======
@@ -90,6 +104,12 @@ http://jeffwinkler.net seems to have now died.
 Thanks to Bitbucket user sgourley for reporting, chasing up and even
 offering to fix issue #1, an egregious bug in ignoring directories, before
 I finally spotted the error. Thanks for the prods!
+
+
+Changes
+=======
+
+1.0.18 Now runs on Python 2.6, and is tested on Python 3.3.
 
 
 Contact

@@ -5,10 +5,13 @@
 
 NAME=rerun
 
-
 test:
-	python -m unittest discover $(NAME)/tests
+	python -m unittest discover rerun/tests
 .PHONY: test
+
+test-2.6:
+	unit2-2.6 discover rerun/tests
+.PHONY: test-2.6
 
 pylint:
 	pylint *.py
@@ -19,7 +22,7 @@ tags:
 .PHONY: tags
 
 clean:
-	rm -rf build dist MANIFEST
+	rm -rf build dist MANIFEST .tox $(NAME).egg-info
 	find . -name '*.py[oc]' -exec rm {} \;
 .PHONY: clean
 
