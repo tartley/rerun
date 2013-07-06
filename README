@@ -34,8 +34,8 @@ Rerun detects changes to files by polling file modification times once per
 second. It looks in the current directory and all its subdirectories. On
 detecting any changes, it clears the terminal and reruns the given command.
 
-It always ignores directories called .svn, .git, .hg, .bzr, build and dist,
-unless given --ignore flags for user-specified ignores.
+It always ignores directories called .svn, .git, .hg, .bzr, build and dist.
+Additions to this list can be given using --ignore.
 
 It always ignores files ending with .pyc or .pyo. This isn't currently
 user-overrideable.
@@ -49,6 +49,11 @@ rerun the tests a second time when .pyo files get updated as a result of
 executing the tests. Handy for seeing the new test results in another console
 window after you hit 'save' in your editor, without having to change window
 focus.
+
+While polling sounds sub-optimal, I've yet to encounter a project large
+enough that rerun's resource usage was even noticeable. (Plus, see discussion
+of 'watchdog' below.)
+
 
 Dependencies
 ============

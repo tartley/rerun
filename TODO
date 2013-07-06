@@ -1,7 +1,6 @@
-* use py2app, create an OSX binary.
-* use py2exe, create a Windows binary.
-* create a Linux binary.
-* bundle Linux binary into a deb or rpm
-* upload docs to read the docs
+* Print a colored datestamp before each rerun
+* Press return to re-run anyway
+* Print 'verbose' info output in another color
+* Make clearing screen optional
 * --ignore should accept globs
-* create a generic Python project template from this
+
