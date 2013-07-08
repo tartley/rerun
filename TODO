@@ -1,3 +1,5 @@
+* --verbose prints command as well (useful to check what escaping is getting
+  applied)
 * print colored timestamp by default.
 * --clear to clear screen first as well.
 * Press return to re-run anyway

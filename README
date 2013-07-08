@@ -85,6 +85,9 @@ Hacking
 To run tests requires mock, tox. On Python 2.6 also requires unittest2. 
 See requirements_dev.txt and requirements_dev_2.6.txt.
 
+See Makefile for a cheatsheet of commonly used commands I use while hacking
+on this.
+
 Install
 =======
 
