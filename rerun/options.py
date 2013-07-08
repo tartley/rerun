@@ -47,7 +47,7 @@ def get_parser(name, skip_dirs, skip_exts):
         action='append', default=skip_dirs, help=HELP_IGNORE)
     parser.add_argument('--version',
         action='version', version='%(prog)s v' + __version__)
-    parser.add_argument('command', nargs=argparse.REMAINDER, help=HELP_COMMAND)
+    parser.add_argument('command', help=HELP_COMMAND)
     return parser
 
 

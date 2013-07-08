@@ -13,7 +13,9 @@ Usage
 
 Where::
 
-    <command>           Command to execute
+    <command>           Command to execute as a single arg, i.e. spaces and
+                        other special characters should be escaped, or else the
+                        whole command should be put in quotes.
     --help|-h           Show this help message and exit.
     --ignore|-i=<file>  File or directory to ignore. Any directories of the
                         given name (and their subdirs) are excluded from the
@@ -26,6 +28,13 @@ Where::
     --verbose|-v        Display the names of changed files before the command
                         output.
     --version           Show version number and exit.
+
+Example:
+
+    rerun --verbose --ignore=__pycache__ "ls | grep r"
+
+This will run ls piped through grep whenever any file changes, apart from
+those files in __pycache__ and its subdirectories.
 
 Description
 ===========
@@ -113,6 +122,10 @@ I finally spotted the error. Thanks for the prods!
 
 Changes
 =======
+
+1.0.19 Now expects commands to be a single arg (i.e. spaces etc should be
+       escaped, or the whole command quoted) thus allowing rerun to work on
+       composite commands, such as pipelines.
 
 1.0.18 Now runs on Python 2.6, and is tested on Python 3.3.
 

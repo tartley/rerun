@@ -3,7 +3,7 @@ try:
 except ImportError:
     import unittest
 
-from mock import Mock, patch
+from mock import call, Mock, patch
 
 from rerun import __version__
 from rerun.options import get_parser, parse_args, validate
@@ -23,45 +23,53 @@ class Test_Options(unittest.TestCase):
         self.assert_get_parser_error(['--version'], 'v%s' % (__version__,))
 
 
-    def test_get_parser_command(self):
+    def test_get_parser_one_command(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
-        options = parser.parse_args('command is this'.split())
-        self.assertEqual(options.command, ['command', 'is', 'this'])
+        options = parser.parse_args(['single command arg'])
+        self.assertEqual(options.command, 'single command arg')
 
+
+    @patch('sys.stderr')
+    def test_get_parser_should_error_on_more_than_one_command(self, mock_stderr):
+        self.assert_get_parser_error(
+            ['one', 'two'],
+            'prog: error: unrecognized arguments: two\n'
+        )
 
     def test_get_parser_command_with_options_in_it(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
-        options = parser.parse_args('ls --color'.split())
-        self.assertEqual(options.command, ['ls', '--color'])
+        options = parser.parse_args(['ls --color'])
+        self.assertEqual(options.command, 'ls --color')
 
 
     def test_get_parser_verbose(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
-        options = parser.parse_args('--verbose command is this'.split())
+        options = parser.parse_args(['--verbose', 'command is this'])
         self.assertTrue(options.verbose)
-        self.assertEqual(options.command, ['command', 'is', 'this'])
+        self.assertEqual(options.command, 'command is this')
 
 
     def test_get_parser_ignore(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
         parser.exit = Mock()
-        options = parser.parse_args('--ignore abc command is this'.split())
+        options = parser.parse_args(['--ignore', 'abc', 'command is this'])
         self.assertEqual(options.ignore, ['dirs', 'abc'])
-        self.assertEqual(options.command, ['command', 'is', 'this'])
+        self.assertEqual(options.command, 'command is this')
 
 
     def test_get_parser_ignore_default(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
-        options = parser.parse_args('command is this'.split())
+        options = parser.parse_args(['command is this'])
         self.assertEqual(options.ignore, ['dirs'])
 
 
     def test_get_parser_ignore_multiple(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
-        options = parser.parse_args(
-            '--ignore abc --ignore def command is this'.split())
+        options = parser.parse_args([
+            '--ignore', 'abc', '--ignore', 'def', 'command is this'
+        ])
         self.assertEqual(options.ignore, ['dirs', 'abc', 'def'])
-        self.assertEqual(options.command, ['command', 'is', 'this'])
+        self.assertEqual(options.command, 'command is this')
 
 
     def test_parse_args(self):

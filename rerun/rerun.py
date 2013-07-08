@@ -90,7 +90,8 @@ def mainloop(options):
             clear_screen()
             if options.verbose and not first_time:
                 print('\n'.join(sorted(changed_files)))
-            subprocess.call(options.command)
+            print options.command
+            subprocess.call(options.command, shell=True)
         time.sleep(1)
         first_time = False
 

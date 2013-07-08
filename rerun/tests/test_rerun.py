@@ -133,7 +133,7 @@ class Test_Rerun(unittest.TestCase):
     def run_mainloop(self, mock_time):
 
         # make time.sleep raise StopIteration so that we can end the
-        # 'while True' loop in main()
+        # 'while True' loop in mainloop()
         def mock_sleep(seconds):
             self.assertEqual(seconds, 1)
             raise StopIteration()
