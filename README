@@ -29,12 +29,15 @@ Where::
                         output.
     --version           Show version number and exit.
 
-Example:
+Example
+=======
+
+::
 
     rerun --verbose --ignore=__pycache__ "ls | grep r"
 
-This will run ls piped through grep whenever any file changes, apart from
-those files in __pycache__ and its subdirectories.
+This will run ls piped through grep whenever any file changs in the current dir
+or its subdirectories, ignoring those under __pycache__ or its subdirectories.
 
 Description
 ===========
