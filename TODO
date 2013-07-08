@@ -1,6 +1,6 @@
+* commands don't recognise shell aliases
 * Print a colored datestamp before each rerun
 * Press return to re-run anyway
 * Print 'verbose' info output in another color
 * Make clearing screen optional
 * --ignore should accept globs
-
