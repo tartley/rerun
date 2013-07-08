@@ -103,13 +103,16 @@ Alternatives
 
 PyPI package 'watchdog' is a cross-platform library for handling file-system
 events, which includes script 'watchmedo', which looks like a more serious and
-heavy-duty version of 'Rerun'. However it doesn't work for my primary use
-case, which is re-running tests when files are saved by Vim. This is due to the
-way Vim writes to temporary files and then moves the temp file to overwrite
-data atomically. Vim thus guaruntees that the user never loses data, but also
-fails to generate the correct FS events that watchmedo is looking for.
+heavy-duty version of 'Rerun'.
 
 https://pypi.python.org/pypi/watchdog
+
+However, watchmedo doesn't seem to work for my primary use case, which is
+re-running tests when files are saved by Vim. This is due to the way Vim writes
+to temporary files and then moves the temp file to overwrite data atomically.
+Vim thus guaruntees that the user never loses data, but also fails to generate
+the correct FS events that watchmedo is looking for.
+
 
 Thanks
 ======
@@ -126,11 +129,13 @@ I finally spotted the error. Thanks for the prods!
 Changes
 =======
 
-1.0.19 Now expects commands to be a single arg (i.e. spaces etc should be
-       escaped, or the whole command quoted) thus allowing rerun to work on
-       composite commands, such as pipelines.
+1.0.19
+    Now expects commands to be a single arg (i.e. spaces etc should be
+    escaped, or the whole command quoted) thus allowing rerun to work on
+    composite commands, such as pipelines.
 
-1.0.18 Now runs on Python 2.6, and is tested on Python 3.3.
+1.0.18
+    Now runs on Python 2.6, and is tested on Python 3.3.
 
 
 Contact
