@@ -36,7 +36,7 @@ Example
 
     rerun --verbose --ignore=__pycache__ "ls | grep r"
 
-This will run ls piped through grep whenever any file changs in the current dir
+This will run ls piped through grep whenever any file changes in the current dir
 or its subdirectories, ignoring those under __pycache__ or its subdirectories.
 
 Description
