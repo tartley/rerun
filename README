@@ -34,10 +34,15 @@ Example
 
 ::
 
-    rerun --verbose --ignore=__pycache__ "ls | grep r"
+    rerun --verbose --ignore=myoutputdir "python -m unittest mymodule"
 
-This will run ls piped through grep whenever any file changes in the current dir
-or its subdirectories, ignoring those under __pycache__ or its subdirectories.
+This will run your tests whenever you save your source code in the current
+dir or its subdirectories, but it won't rerun the tests a second time when .pyo
+files get updated as a result of executing the tests, nor when our program
+writes to myoutputdir.
+
+This is handy for seeing the new test results in another console window after
+you hit 'save' in your editor, without having to change window focus.
 
 Description
 ===========
@@ -51,16 +56,6 @@ Additions to this list can be given using --ignore.
 
 It always ignores files ending with .pyc or .pyo. This isn't currently
 user-overrideable.
-
-e.g::
-
-    rerun python -m unittest mypackage.mymodule
-
-will rerun your tests every time you save your source code, but it won't
-rerun the tests a second time when .pyo files get updated as a result of
-executing the tests. Handy for seeing the new test results in another console
-window after you hit 'save' in your editor, without having to change window
-focus.
 
 While polling sounds sub-optimal, I've yet to encounter a project large
 enough that rerun's resource usage was even noticeable. (Plus, see discussion

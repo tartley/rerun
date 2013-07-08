@@ -97,7 +97,7 @@ def mainloop(options):
 
 
 def main():
-    # setup.py install/develop creates an executable that calls 'main()'
+    # this fn exposed as a command-line entry point by setup.py install/develop
     mainloop(
         validate(
             parse_args(
