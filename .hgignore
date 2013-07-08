@@ -2,4 +2,5 @@
 activate
 dist
 rerun.egg-info
+tags
 
