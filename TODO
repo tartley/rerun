@@ -1,6 +1,11 @@
-* commands don't recognise shell aliases
-* Print a colored datestamp before each rerun
+* print colored timestamp by default.
+* --clear to clear screen first as well.
 * Press return to re-run anyway
 * Print 'verbose' info output in another color
-* Make clearing screen optional
+* output command exitval
 * --ignore should accept globs
+* preserve colors in command output
+* use docopt
+
+Won't fix:
+* commands don't recognise shell aliases
