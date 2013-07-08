@@ -10,7 +10,7 @@ test:
 .PHONY: test
 
 test-2.6:
-	unit2-2.6 discover rerun/tests
+	unit2-2.6 discover .
 .PHONY: test-2.6
 
 pylint:
