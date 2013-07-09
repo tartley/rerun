@@ -144,6 +144,7 @@ class Test_Rerun(unittest.TestCase):
         self.assertFalse(mock_subprocess.call.called)
 
 
+    @patch('sys.stdout')
     @patch('rerun.rerun.get_changed_files')
     @patch('rerun.rerun.is_ignorable')
     @patch('rerun.rerun.clear_screen')
@@ -151,15 +152,44 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.time.sleep', Mock())
     def test_step_with_changes(
         self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
-        mock_get_changed_files,
+        mock_get_changed_files, mock_stdout
     ):
-        mock_get_changed_files.return_value = ['somefile']
+        mock_get_changed_files.return_value = ['myfile']
         mock_is_ignorable.return_value = False
+        options = Mock(verbose=False)
 
-        step(True, Mock())
+        step(False, options)
 
         self.assertTrue(mock_clear_screen.called)
         self.assertTrue(mock_subprocess.call.called)
+        self.assertFalse(mock_stdout.write.called)
+
+
+    @patch('sys.stdout')
+    @patch('rerun.rerun.get_changed_files')
+    @patch('rerun.rerun.is_ignorable')
+    @patch('rerun.rerun.clear_screen')
+    @patch('rerun.rerun.subprocess')
+    @patch('rerun.rerun.time.sleep', Mock())
+    def test_step_with_changes_and_verbose_output(
+        self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
+        mock_get_changed_files, mock_stdout
+    ):
+        mock_get_changed_files.return_value = ['myfile']
+        mock_is_ignorable.return_value = False
+        options = Mock(command='mycommand', verbose=True)
+
+        step(False, options)
+
+        self.assertTrue(mock_clear_screen.called)
+        self.assertTrue(mock_subprocess.call.called)
+        self.assertEqual(
+            mock_stdout.write.call_args_list,
+            [
+                call('mycommand'), call('\n'),
+                call('myfile'), call('\n'),
+            ]
+        )
 
 
     @patch('rerun.rerun.get_changed_files')
@@ -171,10 +201,10 @@ class Test_Rerun(unittest.TestCase):
         self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
         mock_get_changed_files,
     ):
-        mock_get_changed_files.return_value = ['somefile']
+        mock_get_changed_files.return_value = ['myfile']
         mock_is_ignorable.return_value = True
 
-        step(True, Mock())
+        step(False, Mock())
 
         self.assertFalse(mock_clear_screen.called)
         self.assertFalse(mock_subprocess.call.called)

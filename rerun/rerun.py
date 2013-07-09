@@ -78,7 +78,6 @@ def clear_screen():
         os.system('clear')
 
 
-
 def step(first_time, options):
     changed_files = list(filterfalse(
         lambda filename: is_ignorable(filename, options.ignore),
@@ -87,8 +86,8 @@ def step(first_time, options):
     if changed_files:
         clear_screen()
         if options.verbose and not first_time:
+            print options.command
             print('\n'.join(sorted(changed_files)))
-        #print options.command
         subprocess.call(options.command, shell=True)
     time.sleep(1)
 
