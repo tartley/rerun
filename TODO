@@ -1,3 +1,4 @@
+* use docopt
 * --verbose prints command as well (useful to check what escaping is getting
   applied)
 * print colored timestamp by default.
@@ -7,7 +8,8 @@
 * output command exitval
 * --ignore should accept globs
 * preserve colors in command output
-* use docopt
+* refactor: use class so the we don't have to pass options about
+* refactor: move conditionals out of mainloop
 
 Won't fix:
 * commands don't recognise shell aliases

@@ -5,11 +5,11 @@ try:
 except ImportError:
     import unittest
 
-from mock import Mock, patch
+from mock import call, Mock, patch
 
 from rerun.rerun import (
     get_changed_files, clear_screen, get_file_mtime, has_file_changed,
-    is_ignorable, main, mainloop, skip_dirs, SKIP_DIRS, SKIP_EXT,
+    is_ignorable, main, mainloop, skip_dirs, SKIP_DIRS, SKIP_EXT, step
 )
 
 
@@ -129,31 +129,16 @@ class Test_Rerun(unittest.TestCase):
         self.assertEqual(mock_system.call_args[0], ('clear',))
 
 
-    @patch('rerun.rerun.time')
-    def run_mainloop(self, mock_time):
-
-        # make time.sleep raise StopIteration so that we can end the
-        # 'while True' loop in mainloop()
-        def mock_sleep(seconds):
-            self.assertEqual(seconds, 1)
-            raise StopIteration()
-
-        mock_time.sleep = mock_sleep
-        options = Mock()
-
-        with self.assertRaises(StopIteration):
-            mainloop(options)
-
-
     @patch('rerun.rerun.get_changed_files')
     @patch('rerun.rerun.clear_screen')
     @patch('rerun.rerun.subprocess')
-    def test_mainloop_no_changes(
+    @patch('rerun.rerun.time.sleep', Mock())
+    def test_step_no_changes(
         self, mock_subprocess, mock_clear_screen, mock_get_changed_files,
     ):
         mock_get_changed_files.return_value = []
 
-        self.run_mainloop()
+        step(True, Mock())
 
         self.assertFalse(mock_clear_screen.called)
         self.assertFalse(mock_subprocess.call.called)
@@ -163,14 +148,15 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.is_ignorable')
     @patch('rerun.rerun.clear_screen')
     @patch('rerun.rerun.subprocess')
-    def test_mainloop_with_changes(
+    @patch('rerun.rerun.time.sleep', Mock())
+    def test_step_with_changes(
         self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
         mock_get_changed_files,
     ):
         mock_get_changed_files.return_value = ['somefile']
         mock_is_ignorable.return_value = False
 
-        self.run_mainloop()
+        step(True, Mock())
 
         self.assertTrue(mock_clear_screen.called)
         self.assertTrue(mock_subprocess.call.called)
@@ -180,17 +166,43 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.is_ignorable')
     @patch('rerun.rerun.clear_screen')
     @patch('rerun.rerun.subprocess')
-    def test_mainloop_with_ignorable_changes(
+    @patch('rerun.rerun.time.sleep', Mock())
+    def test_step_with_ignorable_changes(
         self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
         mock_get_changed_files,
     ):
         mock_get_changed_files.return_value = ['somefile']
         mock_is_ignorable.return_value = True
 
-        self.run_mainloop()
+        step(True, Mock())
 
         self.assertFalse(mock_clear_screen.called)
         self.assertFalse(mock_subprocess.call.called)
+
+
+    @patch('rerun.rerun.step')
+    def test_mainloop(self, mock_step):
+        calls = []
+
+        def raise_after_3(first_time, options):
+            calls.append(0)
+            if len(calls) == 3:
+                raise ZeroDivisionError()
+
+        mock_step.side_effect = raise_after_3
+
+        options = Mock()
+        with self.assertRaises(ZeroDivisionError):
+            mainloop(options)
+
+        self.assertEqual(
+            mock_step.call_args_list,
+            [
+                call(True, options),
+                call(False, options),
+                call(False, options),
+            ]
+        )
 
 
     @patch('rerun.rerun.sys.argv', [1, 2, 3])
