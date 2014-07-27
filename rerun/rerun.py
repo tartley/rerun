@@ -86,7 +86,7 @@ def step(first_time, options):
     if changed_files:
         clear_screen()
         if options.verbose and not first_time:
-            print options.command
+            print(options.command)
             print('\n'.join(sorted(changed_files)))
         subprocess.call(options.command, shell=True)
     time.sleep(1)

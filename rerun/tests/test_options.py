@@ -1,9 +1,12 @@
+import sys
 try:
+    # Python <= 2.6
     import unittest2 as unittest
 except ImportError:
+    # Python >= 2.7
     import unittest
 
-from mock import call, Mock, patch
+from mock import Mock, call, patch
 
 from rerun import __version__
 from rerun.options import get_parser, parse_args, validate
@@ -11,16 +14,19 @@ from rerun.options import get_parser, parse_args, validate
 
 class Test_Options(unittest.TestCase):
 
-    @patch('sys.stderr')
-    def assert_get_parser_error(self, args, expected, mock_stderr):
+    def assert_get_parser_error(self, args, expected, stream):
         parser = get_parser('prog', ['dirs'], ['exts'])
         with self.assertRaises(SystemExit):
             parser.parse_args(args)
-        self.assertIn(expected, mock_stderr.write.call_args[0][0])
+        self.assertEqual(stream.write.call_args, call(expected))
 
 
     def test_get_parser_version(self):
-        self.assert_get_parser_error(['--version'], 'v%s' % (__version__,))
+        is_python3 = sys.version_info[:2] >= (3, 0)
+        error_msg_stream = 'sys.stdout' if is_python3 else 'sys.stderr'
+        with patch(error_msg_stream) as mock_stream:
+            self.assert_get_parser_error(
+                ['--version'], 'prog v%s\n' % (__version__,), mock_stream)
 
 
     def test_get_parser_one_command(self):
@@ -30,11 +36,13 @@ class Test_Options(unittest.TestCase):
 
 
     @patch('sys.stderr')
-    def test_get_parser_should_error_on_more_than_one_command(self, mock_stderr):
-        self.assert_get_parser_error(
-            ['one', 'two'],
-            'prog: error: unrecognized arguments: two\n'
-        )
+    def test_get_parser_should_error_on_more_than_1_command(self, mock_stderr):
+        with patch('sys.stderr') as mock_stderr:
+            self.assert_get_parser_error(
+                ['one', 'two'],
+                'prog: error: unrecognized arguments: two\n',
+                mock_stderr
+            )
 
     def test_get_parser_command_with_options_in_it(self):
         parser = get_parser('prog', ['dirs'], ['exts'])
