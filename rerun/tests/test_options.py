@@ -12,6 +12,15 @@ from rerun import __version__
 from rerun.options import get_parser, parse_args, validate
 
 
+def get_stream_argparse_writes_version_to():
+    '''
+    Argparse in Python 3.4 stdlib writes version number to stdout,
+    whereas argparse from PyPI writes to stderr.
+    '''
+    is_python3 = sys.version_info[:2] >= (3, 0)
+    return 'sys.stdout' if is_python3 else 'sys.stderr'
+
+
 class Test_Options(unittest.TestCase):
 
     def assert_get_parser_error(self, args, expected, stream):
@@ -22,9 +31,7 @@ class Test_Options(unittest.TestCase):
 
 
     def test_get_parser_version(self):
-        is_python3 = sys.version_info[:2] >= (3, 0)
-        error_msg_stream = 'sys.stdout' if is_python3 else 'sys.stderr'
-        with patch(error_msg_stream) as mock_stream:
+        with patch(get_stream_argparse_writes_version_to()) as mock_stream:
             self.assert_get_parser_error(
                 ['--version'], 'prog v%s\n' % (__version__,), mock_stream)
 
