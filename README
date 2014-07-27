@@ -13,9 +13,9 @@ Usage
 
 Where::
 
-    <command>           Command to execute as a single arg, i.e. spaces and
-                        other special characters should be escaped, or else the
-                        whole command should be put in quotes.
+    <command>           Command to execute as a single arg, i.e. put it inside
+                        double quotes, or else spaces and other special
+                        characters should be escaped.
     --help|-h           Show this help message and exit.
     --ignore|-i=<file>  File or directory to ignore. Any directories of the
                         given name (and their subdirs) are excluded from the
@@ -67,7 +67,7 @@ Dependencies
 
 Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
-Tested on Python 2.6, 2.7 and 3.3.
+Tested on Python 2.6, 2.7 and 3.4.
 
 Python 2.6 requires argparse to be installed -
 see requirements_2.6.txt.
@@ -93,7 +93,7 @@ Install
 Known Problems
 ==============
 
-See issues at https://bitbucket.org/tartley/rerun/issues
+See issues at https://github.com/tartley/rerun/issues
 
 
 Alternatives
@@ -108,7 +108,7 @@ https://pypi.python.org/pypi/watchdog
 However, watchmedo doesn't seem to work for my primary use case, which is
 re-running tests when files are saved by Vim. This is due to the way Vim writes
 to temporary files and then moves the temp file to overwrite data atomically.
-Vim thus guaruntees that the user never loses data, but also fails to generate
+Vim thus guarantees that the user never loses data, but also fails to generate
 the correct FS events that watchmedo is looking for.
 
 
@@ -127,6 +127,10 @@ I finally spotted the error. Thanks for the prods!
 Changes
 =======
 
+1.0.20
+    (First release since migration to github)
+    Fix to run under Python 3 again, specifically tested on 3.4.
+
 1.0.19
     Now expects commands to be a single arg (i.e. spaces etc should be
     escaped, or the whole command quoted) thus allowing rerun to work on
@@ -143,7 +147,7 @@ Contact
     http://pypi.python.org/pypi/rerun/
 
 :Souce code and issues:
-    https://bitbucket.org/tartley/rerun
+    https://github.com/tartley/rerun
 
 :Contact the author:
     Jonathan Hartley, email: tartley at domain tartley.com, Twitter: @tartley.

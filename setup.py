@@ -70,7 +70,7 @@ def get_sdist_config():
 
     install_requires = []
     if sys.version_info < (2, 7):
-        install_requires.append("argparse >= 1.2.1")
+        install_requires.append("argparse == 1.2.1")
 
     return dict(
         name=NAME,
@@ -87,28 +87,10 @@ def get_sdist_config():
         },
         install_requires=install_requires,
         packages=find_packages(exclude=('*.tests',)),
-        #include_package_data=True,
-        #package_data={
-            #'package.subpackage': ['globs'],
-            #NAME: get_package_data('data')
-        #},
-        #exclude_package_data={
-            #'package.subpackage': ['globs']
-        #},
-        #data_files=[
-            # ('install-dir', ['files-relative-to-setup.py']),
-        #], 
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
-            #'Development Status :: 1 - Planning',
-            #'Development Status :: 2 - Pre-Alpha',
-            #'Development Status :: 3 - Alpha',
-            #'Development Status :: 4 - Beta',
             'Development Status :: 5 - Production/Stable',
-            #'Development Status :: 6 - Mature',
-            #'Development Status :: 7 - Inactive',
             'Intended Audience :: Developers',
-            #'Intended Audience :: End Users/Desktop',
             'License :: OSI Approved :: BSD License',
             'Natural Language :: English',
             'Operating System :: Microsoft :: Windows',
@@ -119,33 +101,20 @@ def get_sdist_config():
             'Programming Language :: Python :: 2.6',
             'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.0',
+            'Programming Language :: Python :: 3.1',
+            'Programming Language :: Python :: 3.2',
             'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: Implementation :: CPython',
         ],
         zip_safe=True,
     )
 
 
-def get_py2app_config():
-    # This doeesn't work. When I run the resulting application, it
-    # barfs due to missing stdlib packages 'platform' and 'ctypes'. Adding
-    # 'platform' to 'options.py2app.packages' (below) fixes that error, but
-    # adding 'ctypes' does not. :-(
-    return dict(
-        app=['rerun/rerun.py'],
-        options=dict(
-            py2app=dict(
-                argv_emulation=True,
-            ),
-        ),
-    )
-
-
 def main():
     config = {}
     config.update(get_sdist_config())
-    if 'py2app' in sys.argv:
-        config.update(get_py2app_config())
     setup(**config)
 
 
