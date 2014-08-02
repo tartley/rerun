@@ -225,15 +225,17 @@ class Test_Rerun(unittest.TestCase):
 
 
     @patch('rerun.rerun.step')
-    def test_mainloop(self, mock_step):
-        calls = []
+    def test_mainloop_calls_step_with_first_time_then_repeatedly_without(
+        self, mock_step
+    ):
+        actions = [None, None, ZeroDivisionError]
 
-        def raise_after_3(options, first_time=False):
-            calls.append(0)
-            if len(calls) == 3:
-                raise ZeroDivisionError()
+        def raise_next_action(options, first_time=False):
+            action = actions.pop(0)
+            if action:
+                raise action()
 
-        mock_step.side_effect = raise_after_3
+        mock_step.side_effect = raise_next_action
 
         options = Mock()
         with self.assertRaises(ZeroDivisionError):
