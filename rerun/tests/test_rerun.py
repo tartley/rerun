@@ -8,7 +8,7 @@ except ImportError:
 from mock import call, Mock, patch
 
 from rerun.rerun import (
-    get_changed_files, clear_screen, get_file_mtime, has_file_changed,
+    act, get_changed_files, clear_screen, get_file_mtime, has_file_changed,
     is_ignorable, main, mainloop, skip_dirs, SKIP_DIRS, SKIP_EXT, step
 )
 
@@ -129,90 +129,99 @@ class Test_Rerun(unittest.TestCase):
         self.assertEqual(mock_system.call_args[0], ('clear',))
 
 
-    @patch('rerun.rerun.get_changed_files')
     @patch('rerun.rerun.clear_screen')
-    @patch('rerun.rerun.subprocess')
-    @patch('rerun.rerun.time.sleep', Mock())
-    def test_step_no_changes_first_time_clears_and_calls(
-        self, mock_subprocess, mock_clear_screen, mock_get_changed_files,
+    @patch('rerun.rerun.sys.stdout')
+    @patch('rerun.rerun.subprocess.call')
+    def test_act_calls_each_thing_in_order(
+        self, mock_call, mock_stdout, mock_clear
     ):
-        mock_get_changed_files.return_value = []
+        options = Mock(command='mycommand')
 
-        step(Mock(), True)
+        act(['mychanges'], options, False)
 
-        self.assertFalse(mock_clear_screen.called)
-        self.assertFalse(mock_subprocess.call.called)
+        self.assertTrue(mock_clear.called)
+        self.assertEqual(
+            mock_stdout.write.call_args_list,
+            [call('mycommand'), call('\n'), call('mychanges'), call('\n')]
+        )
+        self.assertEqual(mock_call.call_args, call(options.command, shell=True))
 
 
-    @patch('sys.stdout')
-    @patch('rerun.rerun.get_changed_files')
-    @patch('rerun.rerun.is_ignorable')
     @patch('rerun.rerun.clear_screen')
-    @patch('rerun.rerun.subprocess')
-    @patch('rerun.rerun.time.sleep', Mock())
-    def test_step_with_changes(
-        self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
-        mock_get_changed_files, mock_stdout
+    @patch('rerun.rerun.sys.stdout')
+    @patch('rerun.rerun.subprocess.call')
+    def test_act_on_first_time_doesnt_print_changed_files(
+        self, mock_call, mock_stdout, mock_clear
     ):
-        mock_get_changed_files.return_value = ['myfile']
-        mock_is_ignorable.return_value = False
+        options = Mock(command='mycommand')
+
+        act(['mychanges'], options, True)
+
+        self.assertTrue(mock_clear.called)
+        self.assertEqual(
+            mock_stdout.write.call_args_list,
+            [call('mycommand'), call('\n')]
+        )
+        self.assertEqual(mock_call.call_args, call(options.command, shell=True))
+
+
+    @patch('rerun.rerun.clear_screen')
+    @patch('rerun.rerun.sys.stdout')
+    @patch('rerun.rerun.subprocess.call')
+    def test_act_without_verbose_doesnt_print_changed_files(
+        self, mock_call, mock_stdout, mock_clear
+    ):
         options = Mock(command='mycommand', verbose=False)
 
-        step(options)
+        act(['mychanges'], options, False)
 
-        self.assertTrue(mock_clear_screen.called)
-        self.assertTrue(mock_subprocess.call.called)
+        self.assertTrue(mock_clear.called)
         self.assertEqual(
             mock_stdout.write.call_args_list,
-            [
-                call('mycommand'), call('\n'),
-            ]
+            [call('mycommand'), call('\n')]
         )
-
-
-    @patch('sys.stdout')
-    @patch('rerun.rerun.get_changed_files')
-    @patch('rerun.rerun.is_ignorable')
-    @patch('rerun.rerun.clear_screen')
-    @patch('rerun.rerun.subprocess')
-    @patch('rerun.rerun.time.sleep', Mock())
-    def test_step_with_changes_and_verbose_output(
-        self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
-        mock_get_changed_files, mock_stdout
-    ):
-        mock_get_changed_files.return_value = ['myfile']
-        mock_is_ignorable.return_value = False
-        options = Mock(command='mycommand', verbose=True)
-
-        step(options)
-
-        self.assertTrue(mock_clear_screen.called)
-        self.assertTrue(mock_subprocess.call.called)
-        self.assertEqual(
-            mock_stdout.write.call_args_list,
-            [
-                call('mycommand'), call('\n'),
-                call('myfile'), call('\n'),
-            ]
-        )
+        self.assertEqual(mock_call.call_args, call(options.command, shell=True))
 
 
     @patch('rerun.rerun.get_changed_files')
-    @patch('rerun.rerun.is_ignorable')
-    @patch('rerun.rerun.clear_screen')
-    @patch('rerun.rerun.subprocess')
+    @patch('rerun.rerun.act')
     @patch('rerun.rerun.time.sleep', Mock())
-    def test_step_with_ignorable_changes(
-        self, mock_subprocess, mock_clear_screen, mock_is_ignorable,
-        mock_get_changed_files,
-    ):
-        mock_get_changed_files.return_value = ['myfile']
-        mock_is_ignorable.return_value = True
+    def test_step_calls_act_if_changed_files(self, mock_act, mock_changed):
+        mock_changed.return_value = ['mychanges']
+        options = Mock(ignore=[])
 
-        step(Mock())
+        step(options)
+        
+        self.assertEqual(
+            mock_act.call_args,
+            call(['mychanges'], options, False)
+        )
 
-        self.assertFalse(mock_clear_screen.called)
-        self.assertFalse(mock_subprocess.call.called)
+    @patch('rerun.rerun.get_changed_files')
+    @patch('rerun.rerun.act')
+    @patch('rerun.rerun.time.sleep', Mock())
+    def test_step_doesnt_call_act_if_no_changed_files(self, mock_act, mock_changed):
+        mock_changed.return_value = []
+        options = Mock(ignore=[])
+
+        step(options)
+        
+        self.assertIsNone(mock_act.call_args)
+
+
+    @patch('rerun.rerun.get_changed_files')
+    @patch('rerun.rerun.act')
+    @patch('rerun.rerun.time.sleep', Mock())
+    def test_step_forwards_first_time_to_act(self, mock_act, mock_changed):
+        mock_changed.return_value = ['mychanges']
+        options = Mock(ignore=[])
+
+        step(options, first_time=True)
+        
+        self.assertEqual(
+            mock_act.call_args,
+            call(['mychanges'], options, True)
+        )
 
 
     @patch('rerun.rerun.step')

@@ -71,6 +71,13 @@ def get_changed_files(ignores):
     return changed_files
 
 
+def get_unignored_changed_files(ignores):
+    return list(filterfalse(
+        lambda filename: is_ignorable(filename, ignores),
+        get_changed_files(ignores)
+    ))
+
+
 def clear_screen():
     if platform.system().lower().startswith('win'):
         os.system('cls')
@@ -78,17 +85,18 @@ def clear_screen():
         os.system('clear')
 
 
+def act(changed_files, options, first_time):
+    clear_screen()
+    print(options.command)
+    if options.verbose and not first_time:
+        print(', '.join(sorted(changed_files)))
+    subprocess.call(options.command, shell=True)
+
+
 def step(options, first_time=False):
-    changed_files = list(filterfalse(
-        lambda filename: is_ignorable(filename, options.ignore),
-        get_changed_files(options.ignore)
-    ))
+    changed_files = get_unignored_changed_files(options.ignore)
     if changed_files:
-        clear_screen()
-        print(options.command)
-        if options.verbose and not first_time:
-            print(', '.join(sorted(changed_files)))
-        subprocess.call(options.command, shell=True)
+        act(changed_files, options, first_time)
     time.sleep(1)
 
 
