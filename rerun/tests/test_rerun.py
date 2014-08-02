@@ -65,23 +65,30 @@ class Test_Rerun(unittest.TestCase):
         self.assertFalse(has_file_changed('filename'))
 
 
+    @patch('rerun.rerun.is_ignorable')
     @patch('rerun.rerun.has_file_changed')
     @patch('rerun.rerun.os')
-    def test_get_changed_files(self, mock_os, mock_changed):
+    def test_get_changed_files(self, mock_os, mock_changed, mock_ignorable):
+
+        def fake_has_changed(relname):
+            return relname in ['root1/f', 'root1/l', 'root1/s']
+        mock_changed.side_effect = fake_has_changed
+
+        def fake_is_ignorable(relname, _):
+            return relname in ['root1/l']
+        mock_ignorable.side_effect = fake_is_ignorable
+
         mock_os.walk.return_value = [
             ('root1', list('dirs1'), list('files')),
         ]
         mock_os.path.join = join
-        # one bool for each file in ['f' 'i' 'l' 'e' 's']
-        has_file_changed_values = [
-            True, False, False, False, True,   # 1st & last file changed
-        ]
-        mock_changed.side_effect = lambda _: has_file_changed_values.pop(0)
 
         actual = get_changed_files([])
 
         self.assertEqual(actual, [join('root1', 'f'), join('root1', 's')])
-        # must call has_file_changed for every file, cannot short-circuit
+        # has_file_changed must be called for every file, cannot short-circuit
+        # or else it will fail to update some files' modification times,
+        # and generate false positives on later calls to step.
         self.assertEqual(mock_changed.call_count, 5)
 
 

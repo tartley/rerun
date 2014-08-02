@@ -65,17 +65,13 @@ def get_changed_files(ignores):
     for root, dirs, files in os.walk('.'):
         skip_dirs(dirs, ignores)
         for filename in files:
-            fullname = os.path.join(root, filename)
-            if has_file_changed(fullname):
-                changed_files.append(fullname)
+            relname = os.path.join(root, filename)
+            if (
+                has_file_changed(relname) and
+                not is_ignorable(relname, ignores)
+            ):
+                changed_files.append(relname)
     return changed_files
-
-
-def get_unignored_changed_files(ignores):
-    return list(filterfalse(
-        lambda filename: is_ignorable(filename, ignores),
-        get_changed_files(ignores)
-    ))
 
 
 def clear_screen():
@@ -94,7 +90,7 @@ def act(changed_files, options, first_time):
 
 
 def step(options, first_time=False):
-    changed_files = get_unignored_changed_files(options.ignore)
+    changed_files = get_changed_files(options.ignore)
     if changed_files:
         act(changed_files, options, first_time)
     time.sleep(1)
