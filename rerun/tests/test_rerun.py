@@ -133,12 +133,12 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.clear_screen')
     @patch('rerun.rerun.subprocess')
     @patch('rerun.rerun.time.sleep', Mock())
-    def test_step_no_changes(
+    def test_step_no_changes_first_time_clears_and_calls(
         self, mock_subprocess, mock_clear_screen, mock_get_changed_files,
     ):
         mock_get_changed_files.return_value = []
 
-        step(True, Mock())
+        step(Mock(), True)
 
         self.assertFalse(mock_clear_screen.called)
         self.assertFalse(mock_subprocess.call.called)
@@ -156,13 +156,18 @@ class Test_Rerun(unittest.TestCase):
     ):
         mock_get_changed_files.return_value = ['myfile']
         mock_is_ignorable.return_value = False
-        options = Mock(verbose=False)
+        options = Mock(command='mycommand', verbose=False)
 
-        step(False, options)
+        step(options)
 
         self.assertTrue(mock_clear_screen.called)
         self.assertTrue(mock_subprocess.call.called)
-        self.assertFalse(mock_stdout.write.called)
+        self.assertEqual(
+            mock_stdout.write.call_args_list,
+            [
+                call('mycommand'), call('\n'),
+            ]
+        )
 
 
     @patch('sys.stdout')
@@ -179,7 +184,7 @@ class Test_Rerun(unittest.TestCase):
         mock_is_ignorable.return_value = False
         options = Mock(command='mycommand', verbose=True)
 
-        step(False, options)
+        step(options)
 
         self.assertTrue(mock_clear_screen.called)
         self.assertTrue(mock_subprocess.call.called)
@@ -204,7 +209,7 @@ class Test_Rerun(unittest.TestCase):
         mock_get_changed_files.return_value = ['myfile']
         mock_is_ignorable.return_value = True
 
-        step(False, Mock())
+        step(Mock())
 
         self.assertFalse(mock_clear_screen.called)
         self.assertFalse(mock_subprocess.call.called)
@@ -214,7 +219,7 @@ class Test_Rerun(unittest.TestCase):
     def test_mainloop(self, mock_step):
         calls = []
 
-        def raise_after_3(first_time, options):
+        def raise_after_3(options, first_time=False):
             calls.append(0)
             if len(calls) == 3:
                 raise ZeroDivisionError()
@@ -228,9 +233,9 @@ class Test_Rerun(unittest.TestCase):
         self.assertEqual(
             mock_step.call_args_list,
             [
-                call(True, options),
-                call(False, options),
-                call(False, options),
+                call(options, first_time=True),
+                call(options),
+                call(options),
             ]
         )
 
