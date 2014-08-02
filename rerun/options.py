@@ -1,4 +1,7 @@
 import argparse
+import os
+import platform
+import pwd
 import sys
 
 from . import __doc__, __version__
@@ -60,8 +63,16 @@ def _exit(message):
     sys.exit(2)
 
 
+def get_default_shell():
+    if platform.system() == 'Windows':
+        return None
+    else:
+        return pwd.getpwuid(os.getuid()).pw_shell
+
+
 def validate(options):
     if len(options.command) == 0:
         _exit('No command specified.')
+    options.shell = get_default_shell()
     return options
 

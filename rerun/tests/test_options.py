@@ -1,3 +1,4 @@
+import platform
 import sys
 try:
     # Python <= 2.6
@@ -9,7 +10,7 @@ except ImportError:
 from mock import Mock, call, patch
 
 from rerun import __version__
-from rerun.options import get_parser, parse_args, validate
+from rerun.options import get_default_shell, get_parser, parse_args, validate
 
 
 def get_stream_argparse_writes_version_to():
@@ -97,7 +98,17 @@ class Test_Options(unittest.TestCase):
         self.assertEqual(options, parser.parse_args.return_value)
 
 
-    def test_validate(self):
+    @unittest.skipIf(platform.system() != 'Windows', 'Not on Windows.')
+    def test_get_default_shell_returns_None_on_Windows(self):
+        self.assertEqual(get_default_shell(), None)
+
+
+    @unittest.skipIf(platform.system() == 'Windows', 'On Windows.')
+    def test_get_default_shell_returns_bash_on_ubuntu(self):
+        self.assertEqual(get_default_shell(), '/bin/bash')
+
+
+    def test_validate_returns_given_options(self):
         options = Mock()
         options.command = [0]
         response = validate(options)
@@ -110,4 +121,12 @@ class Test_Options(unittest.TestCase):
         options.command = []
         validate(options)
         self.assertEqual(mock_exit.call_args, (('No command specified.',), ))
+
+
+    @patch('rerun.options.get_default_shell', Mock(return_value='myshell'))
+    def test_validate_sets_shell(self):
+        options = Mock()
+        options.command = [0]
+        response = validate(options)
+        self.assertEqual(response.shell, 'myshell')
 
