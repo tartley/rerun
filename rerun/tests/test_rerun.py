@@ -71,21 +71,21 @@ class Test_Rerun(unittest.TestCase):
     def test_get_changed_files(self, mock_os, mock_changed, mock_ignorable):
 
         def fake_has_changed(relname):
-            return relname in ['root1/f', 'root1/l', 'root1/s']
+            return relname in ['root/f', 'root/l', 'root/s']
         mock_changed.side_effect = fake_has_changed
 
         def fake_is_ignorable(relname, _):
-            return relname in ['root1/l']
+            return relname in ['root/l']
         mock_ignorable.side_effect = fake_is_ignorable
 
         mock_os.walk.return_value = [
-            ('root1', list('dirs1'), list('files')),
+            ('root', list('dirs'), list('files')),
         ]
         mock_os.path.join = join
 
         actual = get_changed_files([])
 
-        self.assertEqual(actual, [join('root1', 'f'), join('root1', 's')])
+        self.assertEqual(actual, [join('root', 'f'), join('root', 's')])
         # has_file_changed must be called for every file, cannot short-circuit
         # or else it will fail to update some files' modification times,
         # and generate false positives on later calls to step.
@@ -96,8 +96,8 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.skip_dirs')
     def test_get_changed_files_calls_skip_dirs(self, mock_skip_dirs, mock_os):
         mock_os.walk.return_value = [
-            ('root1', list('dirs1'), list('files')),
-            ('root2', list('dirs2'), list('files')),
+            ('root1', list('dirs1'), list('files1')),
+            ('root2', list('dirs2'), list('files2')),
         ]
         ignoreds = []
 
@@ -142,7 +142,7 @@ class Test_Rerun(unittest.TestCase):
     def test_act_calls_each_thing_in_order(
         self, mock_call, mock_stdout, mock_clear
     ):
-        options = Mock(command='mycommand')
+        options = Mock(command='mycommand', shell='myshell')
 
         act(['mychanges'], options, False)
 
@@ -151,7 +151,10 @@ class Test_Rerun(unittest.TestCase):
             mock_stdout.write.call_args_list,
             [call('mycommand'), call('\n'), call('mychanges'), call('\n')]
         )
-        self.assertEqual(mock_call.call_args, call(options.command, shell=True))
+        self.assertEqual(
+            mock_call.call_args,
+            call(options.command, shell=True, executable='myshell')
+        )
 
 
     @patch('rerun.rerun.clear_screen')
@@ -160,7 +163,7 @@ class Test_Rerun(unittest.TestCase):
     def test_act_on_first_time_doesnt_print_changed_files(
         self, mock_call, mock_stdout, mock_clear
     ):
-        options = Mock(command='mycommand')
+        options = Mock(command='mycommand', shell='myshell')
 
         act(['mychanges'], options, True)
 
@@ -169,7 +172,10 @@ class Test_Rerun(unittest.TestCase):
             mock_stdout.write.call_args_list,
             [call('mycommand'), call('\n')]
         )
-        self.assertEqual(mock_call.call_args, call(options.command, shell=True))
+        self.assertEqual(
+            mock_call.call_args,
+            call(options.command, shell=True, executable='myshell')
+        )
 
 
     @patch('rerun.rerun.clear_screen')
@@ -178,7 +184,7 @@ class Test_Rerun(unittest.TestCase):
     def test_act_without_verbose_doesnt_print_changed_files(
         self, mock_call, mock_stdout, mock_clear
     ):
-        options = Mock(command='mycommand', verbose=False)
+        options = Mock(command='mycommand', shell='myshell', verbose=False)
 
         act(['mychanges'], options, False)
 
@@ -187,7 +193,10 @@ class Test_Rerun(unittest.TestCase):
             mock_stdout.write.call_args_list,
             [call('mycommand'), call('\n')]
         )
-        self.assertEqual(mock_call.call_args, call(options.command, shell=True))
+        self.assertEqual(
+            mock_call.call_args,
+            call(options.command, shell=True, executable='myshell')
+        )
 
 
     @patch('rerun.rerun.get_changed_files')
