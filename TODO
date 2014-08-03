@@ -1,12 +1,7 @@
-* print colored timestamp by default.
-* --clear to clear screen first as well.
 * Press return to re-run anyway
-* Print 'verbose' info output in another color
-* output command exitval
 * --ignore should accept globs
+* output command exitval
+* print colored timestamp alongside command
+* --no-clear to stop clearing screen
+* Print 'verbose' info output in another color
 * preserve colors in command output
-* refactor: use class so the we don't have to pass options about
-* refactor: move conditionals out of mainloop
-
-Won't fix:
-* commands don't recognise shell aliases
