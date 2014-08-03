@@ -69,7 +69,7 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.os')
     def test_get_changed_files(self, mock_os, mock_changed):
         mock_os.walk.return_value = [
-            ('root1', list('dirs1'), list('files')),
+            ('root', list('dirs'), list('files')),
         ]
         mock_os.path.join = join
         # one bool for each file in ['f' 'i' 'l' 'e' 's']
@@ -80,7 +80,7 @@ class Test_Rerun(unittest.TestCase):
 
         actual = get_changed_files([])
 
-        self.assertEqual(actual, [join('root1', 'f'), join('root1', 's')])
+        self.assertEqual(actual, [join('root', 'f'), join('root', 's')])
         # must call has_file_changed for every file, cannot short-circuit
         self.assertEqual(mock_changed.call_count, 5)
 
@@ -89,8 +89,8 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.skip_dirs')
     def test_get_changed_files_calls_skip_dirs(self, mock_skip_dirs, mock_os):
         mock_os.walk.return_value = [
-            ('root1', list('dirs1'), list('files')),
-            ('root2', list('dirs2'), list('files')),
+            ('root1', list('dirs1'), list('files1')),
+            ('root2', list('dirs2'), list('files2')),
         ]
         ignoreds = []
 
