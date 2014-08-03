@@ -228,7 +228,7 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.get_changed_files')
     @patch('rerun.rerun.act')
     @patch('rerun.rerun.time.sleep', Mock())
-    def test_step_forwards_first_time_to_act(self, mock_act, mock_changed):
+    def test_step_passes_first_time_to_act(self, mock_act, mock_changed):
         mock_changed.return_value = ['mychanges']
         options = Mock(ignore=[])
 
