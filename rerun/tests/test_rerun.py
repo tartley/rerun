@@ -167,14 +167,9 @@ class Test_Rerun(unittest.TestCase):
 
         act(['mychanges'], options, True)
 
-        self.assertTrue(mock_clear.called)
         self.assertEqual(
             mock_stdout.write.call_args_list,
             [call('mycommand'), call('\n')]
-        )
-        self.assertEqual(
-            mock_call.call_args,
-            call(options.command, shell=True, executable='myshell')
         )
 
 
@@ -188,14 +183,9 @@ class Test_Rerun(unittest.TestCase):
 
         act(['mychanges'], options, False)
 
-        self.assertTrue(mock_clear.called)
         self.assertEqual(
             mock_stdout.write.call_args_list,
             [call('mycommand'), call('\n')]
-        )
-        self.assertEqual(
-            mock_call.call_args,
-            call(options.command, shell=True, executable='myshell')
         )
 
 
