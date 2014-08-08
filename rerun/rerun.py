@@ -87,9 +87,10 @@ def act(changed_files, options, first_time):
     Clear the screen and print some info before we call it.
     '''
     clear_screen()
+    print(options.command)
     if options.verbose and not first_time:
         print(', '.join(sorted(changed_files)))
-    subprocess.call([options.shell, '-i', '-c', options.command])
+    subprocess.call(options.command, shell=True, executable=options.shell)
 
 
 def step(options, first_time=False):
