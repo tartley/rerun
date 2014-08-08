@@ -115,13 +115,17 @@ the correct FS events that watchmedo is looking for.
 Thanks
 ======
 
-The idea came from the Bash command 'watch', and inspiration for this
-implementation came from an old blog post by Jeff Winkler, whos website
-http://jeffwinkler.net seems to have now died.
+Huge thanks to StackOverflow user 'rici', for explaining how to interpret
+shell aliases and functions in the given command using an interactive shell,
+and then how to retrieve the lost terminal once that shell terminates.
 
 Thanks to Bitbucket user sgourley for reporting, chasing up and even
 offering to fix issue #1, an egregious bug in ignoring directories, before
 I finally spotted the error. Thanks for the prods!
+
+The idea came from the Bash command 'watch', and inspiration for this
+implementation came from an old blog post by Jeff Winkler, whos website
+http://jeffwinkler.net seems to have now died.
 
 
 Changes
