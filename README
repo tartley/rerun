@@ -127,6 +127,10 @@ I finally spotted the error. Thanks for the prods!
 Changes
 =======
 
+1.0.21
+    Run user's given command in an interactive shell, so that shell aliases
+    and functions are correctly interpreted.
+
 1.0.20
     (First release since migration to github)
     Fix to run under Python 3 again, specifically tested on 3.4.

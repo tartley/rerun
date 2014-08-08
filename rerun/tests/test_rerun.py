@@ -1,4 +1,5 @@
-from os.path import join
+import os
+import signal
 import stat
 try:
     import unittest2 as unittest
@@ -81,11 +82,14 @@ class Test_Rerun(unittest.TestCase):
         mock_os.walk.return_value = [
             ('root', list('dirs'), list('files')),
         ]
-        mock_os.path.join = join
+        mock_os.path.join = os.path.join
 
         actual = get_changed_files([])
 
-        self.assertEqual(actual, [join('root', 'f'), join('root', 's')])
+        self.assertEqual(
+            actual,
+            [os.path.join('root', 'f'), os.path.join('root', 's')]
+        )
         # has_file_changed must be called for every file, cannot short-circuit
         # or else it will fail to update some files' modification times,
         # and generate false positives on later calls to step.
@@ -139,8 +143,9 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.clear_screen')
     @patch('rerun.rerun.sys.stdout')
     @patch('rerun.rerun.subprocess.call')
+    @patch('rerun.rerun.os.tcsetpgrp')
     def test_act_calls_each_thing_in_order(
-        self, mock_call, mock_stdout, mock_clear
+        self, mock_tcsetpgrp, mock_call, mock_stdout, mock_clear
     ):
         options = Mock(command='mycommand', shell='myshell')
 
@@ -153,7 +158,29 @@ class Test_Rerun(unittest.TestCase):
         )
         self.assertEqual(
             mock_call.call_args,
-            call(options.command, shell=True, executable='myshell')
+            call([options.shell, '-i', '-c', options.command])
+        )
+        self.assertEqual(
+            mock_tcsetpgrp.call_args,
+            call(0, os.getpgrp())
+        )
+
+
+    @patch('rerun.rerun.clear_screen', Mock())
+    @patch('rerun.rerun.sys.stdout', Mock())
+    @patch('rerun.rerun.subprocess.call')
+    @patch('rerun.rerun.os.tcsetpgrp')
+    def test_act_calls_tcgetpgrp_even_on_exception(
+        self, mock_tcsetpgrp, mock_call
+    ):
+        mock_call.side_effect = ZeroDivisionError('injected')
+
+        with self.assertRaises(ZeroDivisionError):
+            act(['mychanges'], Mock(), False)
+
+        self.assertEqual(
+            mock_tcsetpgrp.call_args,
+            call(0, os.getpgrp())
         )
 
 
@@ -262,12 +289,18 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.parse_args')
     @patch('rerun.rerun.validate')
     @patch('rerun.rerun.mainloop')
+    @patch('rerun.rerun.signal.signal')
     def test_main(
-        self, mock_mainloop, mock_validate, mock_parse_args, mock_get_parser
+        self, mock_signal, mock_mainloop, mock_validate, mock_parse_args,
+        mock_get_parser,
     ):
 
         main()
 
+        self.assertEqual(
+            mock_signal.call_args,
+            call(signal.SIGTTOU, signal.SIG_IGN)
+        )
         self.assertEqual(
             mock_get_parser.call_args,
             (('rerun', SKIP_DIRS, SKIP_EXT), )

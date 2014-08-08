@@ -1,6 +1,7 @@
 import itertools
 import os
 import platform
+import signal
 import stat
 import sys
 import subprocess
@@ -83,14 +84,21 @@ def clear_screen():
 
 def act(changed_files, options, first_time):
     '''
-    Actually call the command we're supposed to 'rerun'
-    Clear the screen and print some info before we call it.
+    Runs the user's specified command.
     '''
     clear_screen()
     print(options.command)
     if options.verbose and not first_time:
         print(', '.join(sorted(changed_files)))
-    subprocess.call(options.command, shell=True, executable=options.shell)
+    # Launch the user's given command in an interactive shell, so that aliases
+    # & functions are interpreted just as when the user types at a terminal.
+    try:
+        subprocess.call([options.shell, '-i', '-c', options.command])
+    finally:
+        # The terminal was attached to the interactive shell we just started,
+        # and left in limbo when that shell terminated. Retrieve it for this
+        # process group, so that we can still print and recieve keypresses.
+        os.tcsetpgrp(0, os.getpgrp())
 
 
 def step(options, first_time=False):
@@ -107,7 +115,15 @@ def mainloop(options):
 
 
 def main():
-    # this fn exposed as a command-line entry point by setup.py install/develop
+    # This fn exposed as a command-line entry point by setup.py install/develop.
+
+    # Ignore SIGTTOU, which we receive after subprocesses launching interactive
+    # shells (which take our terminal with them) terminate (leaving the terminal
+    # in limbo.) If we ignore the resulting SIGTTOU, then we can get the
+    # terminal back and proceed. See
+    # http://stackoverflow.com/questions/25099895/from-python-start-a-shell-that-can-interpret-functions-and-aliases
+    signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+
     mainloop(
         validate(
             parse_args(
