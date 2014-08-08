@@ -82,9 +82,11 @@ def clear_screen():
 
 
 def act(changed_files, options, first_time):
+    '''
+    Actually call the command we're supposed to 'rerun'
+    Clear the screen and print some info before we call it.
+    '''
     clear_screen()
-    print(options.command)
-    print('shell:', os.environ['SHELL'])
     if options.verbose and not first_time:
         print(', '.join(sorted(changed_files)))
     subprocess.call([options.shell, '-i', '-c', options.command])
