@@ -63,16 +63,24 @@ def _exit(message):
     sys.exit(2)
 
 
-def get_default_shell():
+def get_current_shell():
+    '''
+    Gets the shell executable that was used to launch rerun.
+    We use this to launch the user's given command, so that it gets
+    interpreted the same way it would if the user typed it at a prompt.
+    On Windows return None, so subprocess just uses its default 'cmd' shell.
+    '''
     if platform.system() == 'Windows':
         return None
     else:
-        return pwd.getpwuid(os.getuid()).pw_shell
+        # parent shell of this process,
+        # or fallback to user's default shell from /etc/passwd
+        return os.environ.get('SHELL', pwd.getpwuid(os.getuid()).pw_shell)
 
 
 def validate(options):
     if len(options.command) == 0:
         _exit('No command specified.')
-    options.shell = get_default_shell()
+    options.shell = get_current_shell()
     return options
 

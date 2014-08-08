@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+import os
 import platform
 import sys
 try:
@@ -10,7 +12,7 @@ except ImportError:
 from mock import Mock, call, patch
 
 from rerun import __version__
-from rerun.options import get_default_shell, get_parser, parse_args, validate
+from rerun.options import get_current_shell, get_parser, parse_args, validate
 
 
 def get_stream_argparse_writes_version_to():
@@ -20,6 +22,21 @@ def get_stream_argparse_writes_version_to():
     '''
     is_python3 = sys.version_info[:2] >= (3, 0)
     return 'sys.stdout' if is_python3 else 'sys.stderr'
+
+
+@contextmanager
+def env_vars(**variables):
+    orig = dict(os.environ)
+    for name, value in dict(variables).items():
+        if value is None:
+            os.environ.pop(name, 0)
+            del variables[name]
+    os.environ.update(variables)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(orig)
 
 
 class Test_Options(unittest.TestCase):
@@ -99,13 +116,22 @@ class Test_Options(unittest.TestCase):
 
 
     @unittest.skipIf(platform.system() != 'Windows', 'Not on Windows.')
-    def test_get_default_shell_returns_None_on_Windows(self):
-        self.assertEqual(get_default_shell(), None)
+    def test_get_current_shell_returns_none_on_Windows(self):
+        self.assertEqual(get_current_shell(), None)
 
 
     @unittest.skipIf(platform.system() == 'Windows', 'On Windows.')
-    def test_get_default_shell_returns_bash_on_ubuntu(self):
-        self.assertEqual(get_default_shell(), '/bin/bash')
+    def test_get_current_shell_returns_shell_env_var(self):
+        with env_vars(SHELL='myshell'):
+            self.assertEqual(get_current_shell(), 'myshell')
+
+
+    @unittest.skipIf(platform.system() == 'Windows', 'On Windows.')
+    @patch('rerun.options.pwd.getpwuid')
+    def test_get_current_shell_falls_back_to_default_shell(self, mock_getpwuid):
+        mock_getpwuid.return_value.pw_shell = 'myshell'
+        with env_vars(SHELL=None):
+            self.assertEqual(get_current_shell(), 'myshell')
 
 
     def test_validate_returns_given_options(self):
@@ -123,7 +149,7 @@ class Test_Options(unittest.TestCase):
         self.assertEqual(mock_exit.call_args, (('No command specified.',), ))
 
 
-    @patch('rerun.options.get_default_shell', Mock(return_value='myshell'))
+    @patch('rerun.options.get_current_shell', Mock(return_value='myshell'))
     def test_validate_sets_shell(self):
         options = Mock()
         options.command = [0]
