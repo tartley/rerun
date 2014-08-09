@@ -118,6 +118,7 @@ Thanks
 Huge thanks to StackOverflow user 'rici', for explaining how to interpret
 shell aliases and functions in the given command using an interactive shell,
 and then how to retrieve the lost terminal once that shell terminates.
+http://stackoverflow.com/questions/25099895/from-python-start-a-shell-that-can-interpret-functions-and-aliases
 
 Thanks to Bitbucket user sgourley for reporting, chasing up and even
 offering to fix issue #1, an egregious bug in ignoring directories, before
