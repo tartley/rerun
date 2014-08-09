@@ -32,7 +32,7 @@ def is_ignorable(filename, ignores):
 
 
 def get_file_mtime(filename):
-    return os.stat(filename)[stat.ST_MTIME]
+    return os.lstat(filename)[stat.ST_MTIME]
 
 
 def skip_dirs(dirs, skips):

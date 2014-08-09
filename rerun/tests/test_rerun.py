@@ -17,11 +17,11 @@ from rerun.rerun import (
 class Test_Rerun(unittest.TestCase):
 
     @patch('rerun.rerun.os')
-    def test_get_file_stats(self, mock_os):
+    def test_get_file_mtime(self, mock_os):
         def mock_stat(filename):
             self.assertEqual(filename, 'hello')
             return mock_filestat
-        mock_os.stat = mock_stat
+        mock_os.lstat = mock_stat
         mock_filestat = {stat.ST_MTIME: 'mymtime'}
 
         time = get_file_mtime('hello')
