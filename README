@@ -132,6 +132,9 @@ http://jeffwinkler.net seems to have now died.
 Changes
 =======
 
+1.0.22
+    No longer crashes when a broken symlink exists under the cwd.
+
 1.0.21
     Run user's given command in an interactive shell, so that shell aliases
     and functions are correctly interpreted.
