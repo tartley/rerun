@@ -147,7 +147,30 @@ class Test_Rerun(unittest.TestCase):
     def test_act_calls_each_thing_in_order(
         self, mock_tcsetpgrp, mock_call, mock_stdout, mock_clear
     ):
-        options = Mock(command='mycommand', shell='myshell')
+        options = Mock(command='mycommand', shell='myshell', interactive=False)
+
+        act(['mychanges'], options, False)
+
+        self.assertTrue(mock_clear.called)
+        self.assertEqual(
+            mock_stdout.write.call_args_list,
+            [call('mycommand'), call('\n'), call('mychanges'), call('\n')]
+        )
+        self.assertEqual(
+            mock_call.call_args,
+            call(options.command, shell=True, executable='myshell')
+        )
+        self.assertIsNone(mock_tcsetpgrp.call_args)
+
+
+    @patch('rerun.rerun.clear_screen')
+    @patch('rerun.rerun.sys.stdout')
+    @patch('rerun.rerun.subprocess.call')
+    @patch('rerun.rerun.os.tcsetpgrp')
+    def test_act_for_interactive_shell_calls_each_thing_in_order(
+        self, mock_tcsetpgrp, mock_call, mock_stdout, mock_clear
+    ):
+        options = Mock(command='mycommand', shell='myshell', interactive=True)
 
         act(['mychanges'], options, False)
 
@@ -170,13 +193,13 @@ class Test_Rerun(unittest.TestCase):
     @patch('rerun.rerun.sys.stdout', Mock())
     @patch('rerun.rerun.subprocess.call')
     @patch('rerun.rerun.os.tcsetpgrp')
-    def test_act_calls_tcgetpgrp_even_on_exception(
+    def test_act_for_interactive_shell_calls_tcgetpgrp_even_on_exception(
         self, mock_tcsetpgrp, mock_call
     ):
         mock_call.side_effect = ZeroDivisionError('injected')
 
         with self.assertRaises(ZeroDivisionError):
-            act(['mychanges'], Mock(), False)
+            act(['mychanges'], Mock(interactive=True), False)
 
         self.assertEqual(
             mock_tcsetpgrp.call_args,

@@ -42,10 +42,17 @@ def env_vars(**variables):
 class Test_Options(unittest.TestCase):
 
     def assert_get_parser_error(self, args, expected, stream):
-        parser = get_parser('prog', ['dirs'], ['exts'])
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
         with self.assertRaises(SystemExit):
             parser.parse_args(args)
         self.assertEqual(stream.write.call_args, call(expected))
+
+
+    def test_get_parser_defaults(self):
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
+        options = parser.parse_args(['command is this'])
+        self.assertEqual(options.ignore, ['ignored-dirs'])
+        self.assertEqual(options.interactive, False)
 
 
     def test_get_parser_version(self):
@@ -55,7 +62,7 @@ class Test_Options(unittest.TestCase):
 
 
     def test_get_parser_one_command(self):
-        parser = get_parser('prog', ['dirs'], ['exts'])
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
         options = parser.parse_args(['single command arg'])
         self.assertEqual(options.command, 'single command arg')
 
@@ -70,39 +77,40 @@ class Test_Options(unittest.TestCase):
             )
 
     def test_get_parser_command_with_options_in_it(self):
-        parser = get_parser('prog', ['dirs'], ['exts'])
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
         options = parser.parse_args(['ls --color'])
         self.assertEqual(options.command, 'ls --color')
 
 
     def test_get_parser_verbose(self):
-        parser = get_parser('prog', ['dirs'], ['exts'])
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
         options = parser.parse_args(['--verbose', 'command is this'])
         self.assertTrue(options.verbose)
         self.assertEqual(options.command, 'command is this')
 
 
     def test_get_parser_ignore(self):
-        parser = get_parser('prog', ['dirs'], ['exts'])
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
         parser.exit = Mock()
         options = parser.parse_args(['--ignore', 'abc', 'command is this'])
-        self.assertEqual(options.ignore, ['dirs', 'abc'])
+        self.assertEqual(options.ignore, ['ignored-dirs', 'abc'])
         self.assertEqual(options.command, 'command is this')
-
-
-    def test_get_parser_ignore_default(self):
-        parser = get_parser('prog', ['dirs'], ['exts'])
-        options = parser.parse_args(['command is this'])
-        self.assertEqual(options.ignore, ['dirs'])
 
 
     def test_get_parser_ignore_multiple(self):
-        parser = get_parser('prog', ['dirs'], ['exts'])
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
         options = parser.parse_args([
             '--ignore', 'abc', '--ignore', 'def', 'command is this'
         ])
-        self.assertEqual(options.ignore, ['dirs', 'abc', 'def'])
+        self.assertEqual(options.ignore, ['ignored-dirs', 'abc', 'def'])
         self.assertEqual(options.command, 'command is this')
+
+
+    def test_get_parser_interactive(self):
+        parser = get_parser('prog', ['ignored-dirs'], ['exts'])
+        parser.exit = Mock()
+        options = parser.parse_args(['--interactive', 'command is this'])
+        self.assertEqual(options.interactive, True)
 
 
     def test_parse_args(self):

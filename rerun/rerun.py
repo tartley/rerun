@@ -82,6 +82,28 @@ def clear_screen():
         os.system('clear')
 
 
+def run_command_in_shell(command, shell):
+    subprocess.call(command, shell=True, executable=shell)
+
+
+def run_command_in_interactive_shell(command, shell):
+    try:
+        subprocess.call([shell, '-i', '-c', command])
+    finally:
+        # The terminal was attached to the interactive shell we just
+        # started, and left in limbo when that shell terminated. Retrieve
+        # it for this process group, so that we can still print and recieve
+        # keypresses.
+        os.tcsetpgrp(0, os.getpgrp())
+
+
+def run_command(command, shell, interactive):
+    if interactive:
+        run_command_in_interactive_shell(command, shell)
+    else:
+        run_command_in_shell(command, shell)
+
+
 def act(changed_files, options, first_time):
     '''
     Runs the user's specified command.
@@ -92,13 +114,7 @@ def act(changed_files, options, first_time):
         print(', '.join(sorted(changed_files)))
     # Launch the user's given command in an interactive shell, so that aliases
     # & functions are interpreted just as when the user types at a terminal.
-    try:
-        subprocess.call([options.shell, '-i', '-c', options.command])
-    finally:
-        # The terminal was attached to the interactive shell we just started,
-        # and left in limbo when that shell terminated. Retrieve it for this
-        # process group, so that we can still print and recieve keypresses.
-        os.tcsetpgrp(0, os.getpgrp())
+    run_command(options.command, options.shell, options.interactive)
 
 
 def step(options, first_time=False):
