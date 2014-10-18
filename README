@@ -132,6 +132,15 @@ http://jeffwinkler.net seems to have now died.
 Changes
 =======
 
+1.0.23
+    Running the given command using a *non*-interactive shell is now the
+    default behaviour. Running an interactive shell for each command invocation
+    requires sourcing .bashrc and the like, and hence is is slow, noisy on
+    stdout, and error-prone. For example, virtualenvwrapper often fails to
+    initialise properly and generates lots of output about it. An interactive
+    shell can be requested when required (i.e. when the command to be run
+    contains shell aliases or functions) with '--interactive' or '-I'.
+
 1.0.22
     No longer crashes when a broken symlink exists under the cwd.
 
