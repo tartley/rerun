@@ -28,6 +28,7 @@ HELP_INTERACTIVE = '''
 Run the command in an interactive shell. This allows the use of shell aliases
 and functions, but is slower, less reliable and noisier on stdout/stderr,
 because it sources ~/.bashrc and the like before running the command.
+Not available on Windows.
 '''
 HELP_VERBOSE = '''
 Display the names of changed files before the command output.

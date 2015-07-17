@@ -25,6 +25,11 @@ Where::
                         will skip the contents of directory "./abc/def/" and
                         will ignore file "./ghi/def". Can be specified multiple
                         times.
+    --interactive, -I   Run the command in an interactive shell. This allows
+                        the use of shell aliases and functions, but is slower,
+                        less reliable and noisier on stdout/stderr, because it
+                        sources ~/.bashrc and the like before running the
+                        command. Not available on Windows.
     --verbose|-v        Display the names of changed files before the command
                         output.
     --version           Show version number and exit.
@@ -131,6 +136,13 @@ http://jeffwinkler.net seems to have now died.
 
 Changes
 =======
+
+1.0.24
+    Last version broke rerun on Windows. Fixed now.
+    (module 'pwd', which we started using to identify the user's default shell,
+    doesn't exist on Windows.) So '-I' or '--interactive' won't work on
+    Windows, but probably the distinction between a regular shell and an
+    interactive one is meaningless there anyway.
 
 1.0.23
     Running the given command using a *non*-interactive shell is now the
