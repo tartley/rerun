@@ -1,7 +1,11 @@
 import argparse
 import os
 import platform
-import pwd
+try:
+    import pwd
+except ImportError:
+    # Can't import on Windows
+    pwd = None
 import sys
 
 from . import __doc__, __version__
@@ -77,7 +81,7 @@ def get_current_shell():
     interpreted the same way it would if the user typed it at a prompt.
     On Windows return None, so subprocess just uses its default 'cmd' shell.
     '''
-    if platform.system() == 'Windows':
+    if pwd is None or platform.system() == 'Windows':
         return None
     else:
         # parent shell of this process,
