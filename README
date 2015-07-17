@@ -137,6 +137,9 @@ http://jeffwinkler.net seems to have now died.
 Changes
 =======
 
+1.0.25
+    Documentation tweaks.
+
 1.0.24
     Last version broke rerun on Windows. Fixed now.
     (module 'pwd', which we started using to identify the user's default shell,
