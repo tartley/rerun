@@ -47,7 +47,12 @@ def has_file_changed(filename):
     '''
     Has the given file changed since last invocation?
     '''
-    mtime = get_file_mtime(filename)
+    try:
+        mtime = get_file_mtime(filename)
+    except FileNotFoundError:
+        del file_stat_cache[filename]
+        return True
+
     if (
         filename not in file_stat_cache or
         file_stat_cache[filename] != mtime

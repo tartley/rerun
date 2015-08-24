@@ -9,8 +9,9 @@ except ImportError:
 from mock import call, Mock, patch
 
 from rerun.rerun import (
-    act, get_changed_files, clear_screen, get_file_mtime, has_file_changed,
-    is_ignorable, main, mainloop, skip_dirs, SKIP_DIRS, SKIP_EXT, step
+    act, get_changed_files, clear_screen, file_stat_cache, get_file_mtime,
+    has_file_changed, is_ignorable, main, mainloop, skip_dirs, SKIP_DIRS,
+    SKIP_EXT, step
 )
 
 
@@ -56,14 +57,24 @@ class Test_Rerun(unittest.TestCase):
 
 
     @patch('rerun.rerun.get_file_mtime')
-    def test_has_file_changed_return_value(self, mock_get_file_stats):
+    def test_has_file_changed_return_value(self, mock_get_file_mtime):
         file_stats = ['mon', 'mon', 'tue', 'tue']
-        mock_get_file_stats.side_effect = lambda _: file_stats.pop(0)
+        mock_get_file_mtime.side_effect = lambda _: file_stats.pop(0)
 
         self.assertTrue(has_file_changed('filename'))
         self.assertFalse(has_file_changed('filename'))
         self.assertTrue(has_file_changed('filename'))
         self.assertFalse(has_file_changed('filename'))
+
+    @patch('rerun.rerun.get_file_mtime')
+    def test_has_file_changed_on_missing_file(self, mock_get_file_mtime):
+        has_file_changed('filename')
+        mock_get_file_mtime.side_effect = FileNotFoundError
+
+        actual = has_file_changed('filename')
+
+        self.assertTrue(actual)
+        self.assertFalse('filename' in file_stat_cache)
 
 
     @patch('rerun.rerun.is_ignorable')
