@@ -1,3 +1,4 @@
-# use dependencies specified in setup.py
+# Dependencies required to run the program.
+# Use those specified in setup.py 'install_requires'
 -e .
 

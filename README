@@ -82,7 +82,7 @@ No other dependencies.
 Hacking
 =======
 
-To run tests requires mock, tox. On Python 2.6 also requires unittest2. 
+To run tests requires mock, tox. On Python 2.6 also requires unittest2.
 See requirements_dev.txt and requirements_dev_2.6.txt.
 
 See Makefile for a cheatsheet of commonly used commands I use while hacking
@@ -110,7 +110,7 @@ heavy-duty version of 'Rerun'.
 
 https://pypi.python.org/pypi/watchdog
 
-However, watchmedo doesn't seem to work for my primary use case, which is
+However, I can't get watchmedo to work for my primary use case, which is
 re-running tests when files are saved by Vim. This is due to the way Vim writes
 to temporary files and then moves the temp file to overwrite data atomically.
 Vim thus guarantees that the user never loses data, but also fails to generate
@@ -136,6 +136,9 @@ http://jeffwinkler.net seems to have now died.
 
 Changes
 =======
+
+1.0.26
+    Prevent crash when a watched file gets deleted.
 
 1.0.25
     Documentation tweaks.

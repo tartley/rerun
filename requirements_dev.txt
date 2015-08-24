@@ -1,3 +1,4 @@
+# Dependencies required to run tests
 -r requirements.txt
 mock==0.8.0
 tox==1.5.0

@@ -1,2 +1,4 @@
+# Dependencies required to run tests on Python 2.6
 -r requirements_dev.txt
 unittest2==0.5.1
+
