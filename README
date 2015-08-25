@@ -4,6 +4,13 @@ Rerun
 Command-line executable Python script to re-run the given command every time
 files are modified in the current directory or its subdirectories.
 
+Install
+=======
+
+::
+
+    pip install rerun
+
 Usage
 =====
 
@@ -66,7 +73,6 @@ While polling sounds sub-optimal, I've yet to encounter a project large
 enough that rerun's resource usage was even noticeable. (Plus, see discussion
 of 'watchdog' below.)
 
-
 Dependencies
 ============
 
@@ -74,32 +80,51 @@ Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
 Tested on Python 2.6, 2.7 and 3.4.
 
-Python 2.6 requires argparse to be installed -
-see requirements_2.6.txt.
-
-No other dependencies.
+Installing using 'pip' will also install any other Python packages that are
+required. (see setup.py 'install_requires')
 
 Hacking
 =======
 
-To run tests requires mock, tox. On Python 2.6 also requires unittest2.
-See requirements_dev.txt and requirements_dev_2.6.txt.
+To install development dependencies:
 
-See Makefile for a cheatsheet of commonly used commands I use while hacking
-on this.
+on Python 2.6:
 
-Install
-=======
+    pip install -r requirements_dev_2.6.txt
 
-::
+On later versions of Python:
 
-    pip install rerun
+    pip install -r requirements_dev.txt
+
+These will also install the runtime dependencies (i.e. requirements.txt,
+which just references the 'install_requires' field in setup.py) so you only
+ever need to install one requirements file.
+
+To run tests:
+
+    make test
+
+See the content of Makefile for a cheatsheet of other commonly used commands
+I use while working on rerun.
+
+TODO
+====
+
+Print a timestamp at the top of the screen, so user can see when the command
+was last run.
+
+Let user press a key to force a rerun.
+
+Should this just be broken down into a command that waits for filesystem events
+and exits? Arguably calling "command" from the shell is many times easier than
+calling it from within "rerun". Then 'rerun' could be written simply as a Bash
+function. Other bash functions could use the same pattern to iterate after
+waiting for a keypress, or a sleep (to poll.)
 
 Known Problems
 ==============
 
 See issues at https://github.com/tartley/rerun/issues
-
 
 Alternatives
 ============
