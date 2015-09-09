@@ -5,11 +5,10 @@ Command-line executable Python script to re-run the given command every time
 files are modified in the current directory or its subdirectories.
 
 THIS PROJECT IS DEPRECATED in favour of https://github.com/tartley/rerun2
-which uses inotify instead of polling, doesn't need any extra complexity
-to handle things like shell aliases and the like, and is beautifully simple
-(a ten line Bash script.) However, rerun2 won't work outside of Linuxland,
-so if you're attached to this original, polling version of rerun, you should,
-fork it, just in case.
+a ten-line Bash script which uses inotify instead of polling, and gracefully
+handles commands containing shell aliases and the like. However, rerun2 won't
+work outside of Linuxland, so if you're attached to this original, polling
+version of rerun, you should fork it, just in case.
 
 Install
 =======
