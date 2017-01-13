@@ -126,7 +126,7 @@ def step(options, first_time=False):
     changed_files = get_changed_files(options.ignore)
     if changed_files:
         act(changed_files, options, first_time)
-    time.sleep(1)
+    time.sleep(0.2)
 
 
 def mainloop(options):
