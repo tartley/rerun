@@ -1,14 +1,16 @@
 Rerun
 =====
 
-Command-line executable Python script to re-run the given command every time
-files are modified in the current directory or its subdirectories.
+Command-line script to re-run the given command when files change.
 
-THIS PROJECT IS DEPRECATED in favour of https://github.com/tartley/rerun2
-a ten-line Bash script which uses inotify instead of polling, and gracefully
-handles commands containing shell aliases and the like. However, rerun2 won't
-work outside of Linuxland, so if you're attached to this original, polling
-version of rerun, you should fork it, just in case.
+In most circumstances, this project is superceded by
+https://github.com/tartley/rerun2 a ten-line Bash script which uses inotify
+instead of polling, and gracefully handles commands containing shell aliases
+and the like. However, rerun2:
+* Won't work outside of Linuxland.
+* Doesn't see filesystem events on mounts in a VM.
+* Doesn't take any command-line args to modify behaviour.
+so this original 'rerun' still has its uses.
 
 Install
 =======
@@ -168,9 +170,11 @@ http://jeffwinkler.net seems to have now died.
 Changes
 =======
 
+1.0.28
+    Add .cache (pytest) and 'node_modules' to the default ignored dirs.
+
 1.0.27
-    Add .cache (pytest) and 'node_modules' to the default ignored
-    dirs.
+    Deleted version, I messed up the PyPI upload.
 
 1.0.26
     Prevent crash when a watched file gets deleted.
