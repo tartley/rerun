@@ -10,7 +10,10 @@ import time
 from .options import get_parser, parse_args, validate
 
 
-SKIP_DIRS = ['.svn', '.git', '.hg', '.bzr', 'build', 'dist']
+SKIP_DIRS = [
+    '.svn', '.git', '.hg', '.bzr',
+    '.cache', 'build', 'dist', 'node_modules',
+]
 SKIP_EXT = ['.pyc', '.pyo']
 
 try:

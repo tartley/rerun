@@ -168,6 +168,10 @@ http://jeffwinkler.net seems to have now died.
 Changes
 =======
 
+1.0.27
+    Add .cache (pytest) and 'node_modules' to the default ignored
+    dirs.
+
 1.0.26
     Prevent crash when a watched file gets deleted.
 

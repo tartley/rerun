@@ -1,8 +1,9 @@
 *.pyc
-__pycache__
-.tox
+__pycache__/
+/.cache/
+/.tox
 activate
-dist
-rerun.egg-info
-tags
+/dist/
+/rerun.egg-info/
+/tags
 
