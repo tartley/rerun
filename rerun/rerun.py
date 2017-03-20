@@ -53,7 +53,8 @@ def has_file_changed(filename):
     try:
         mtime = get_file_mtime(filename)
     except FileNotFoundError:
-        del file_stat_cache[filename]
+        if filename in file_stat_cache:
+            del file_stat_cache[filename]
         return True
 
     if (

@@ -3,6 +3,7 @@ __pycache__/
 /.cache/
 /.tox
 activate
+/build/
 /dist/
 /rerun.egg-info/
 /tags
