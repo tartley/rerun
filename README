@@ -170,6 +170,10 @@ http://jeffwinkler.net seems to have now died.
 Changes
 =======
 
+1.0.31
+    Add deprecation warning. We're going to hand the PyPI name 'rerun'
+    over to the good folks at rerun.io.
+
 1.0.28
     Add .cache (pytest) and 'node_modules' to the default ignored dirs.
 
