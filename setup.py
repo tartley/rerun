@@ -87,11 +87,11 @@ def get_sdist_config():
         },
         install_requires=install_requires,
         packages=find_packages(exclude=('*.tests',)),
+        license="BSD-2-Clause",
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Intended Audience :: Developers',
-            'License :: OSI Approved :: BSD License',
             'Natural Language :: English',
             'Operating System :: Microsoft :: Windows',
             'Operating System :: MacOS :: MacOS X',
