@@ -219,5 +219,5 @@ http://jeffwinkler.net seems to have now died.
 
 [Documentation & download](http://pypi.python.org/pypi/rerun/)  
 [Souce code and issues](https://github.com/tartley/rerun)  
-Email: tartley at domain tartley.com
-[Mastodon]: [tartley@fosstodon.org](https://fosstodon.org/@tartley)
+Email: tartley at domain tartley.com  
+Mastodon: [tartley@fosstodon.org](https://fosstodon.org/@tartley)
