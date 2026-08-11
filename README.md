@@ -1,60 +1,52 @@
-Rerun
-=====
+# Rerun
 
 Command-line script to re-run the given command when files change.
 
-In most circumstances, this project is superceded by
-https://github.com/tartley/rerun2 a ten-line Bash script which uses inotify
-instead of polling, and gracefully handles commands containing shell aliases
-and the like. However, rerun2:
-* Won't work outside of Linuxland.
-* Doesn't see filesystem events on mounts in a VM.
-* Doesn't take any command-line args to modify behaviour.
-so this original 'rerun' still has its uses.
+This project was first superseded by [rerun2](https://github.com/tartley/rerun2),
+and nowadays I just use [entr](https://eradman.com/entrproject/) instead.
 
-Install
-=======
+## Install
 
-::
+```
+pip install rerun
+```
 
-    pip install rerun
+## Usage
 
-Usage
-=====
-
-::
-
-    rerun [--help|-h] [--verbose|-v] [--ignore|-i=<file>] [--version] <command>
+```
+rerun [--help|-h] [--verbose|-v] [--ignore|-i=<file>] [--version] <command>
+```
 
 Where::
 
-    <command>           Command to execute as a single arg, i.e. put it inside
-                        double quotes, or else spaces and other special
-                        characters should be escaped.
-    --help|-h           Show this help message and exit.
-    --ignore|-i=<file>  File or directory to ignore. Any directories of the
-                        given name (and their subdirs) are excluded from the
-                        search for changed files. Any modification to files of
-                        the given name are ignored. The given value is
-                        compared to basenames, so for example, "--ignore=def"
-                        will skip the contents of directory "./abc/def/" and
-                        will ignore file "./ghi/def". Can be specified multiple
-                        times.
-    --interactive, -I   Run the command in an interactive shell. This allows
-                        the use of shell aliases and functions, but is slower,
-                        less reliable and noisier on stdout/stderr, because it
-                        sources ~/.bashrc and the like before running the
-                        command. Not available on Windows.
-    --verbose|-v        Display the names of changed files before the command
-                        output.
-    --version           Show version number and exit.
+```
+<command>           Command to execute as a single arg, i.e. put it inside
+                    double quotes, or else spaces and other special
+                    characters should be escaped.
+--help|-h           Show this help message and exit.
+--ignore|-i=<file>  File or directory to ignore. Any directories of the
+                    given name (and their subdirs) are excluded from the
+                    search for changed files. Any modification to files of
+                    the given name are ignored. The given value is
+                    compared to basenames, so for example, "--ignore=def"
+                    will skip the contents of directory "./abc/def/" and
+                    will ignore file "./ghi/def". Can be specified multiple
+                    times.
+--interactive, -I   Run the command in an interactive shell. This allows
+                    the use of shell aliases and functions, but is slower,
+                    less reliable and noisier on stdout/stderr, because it
+                    sources ~/.bashrc and the like before running the
+                    command. Not available on Windows.
+--verbose|-v        Display the names of changed files before the command
+                    output.
+--version           Show version number and exit.
+```
 
-Example
-=======
+## Example
 
-::
-
-    rerun --verbose --ignore=myoutputdir "python -m unittest mymodule"
+```
+rerun --verbose --ignore=myoutputdir "python -m unittest mymodule"
+```
 
 This will run your tests whenever you save your source code in the current
 dir or its subdirectories, but it won't rerun the tests a second time when .pyo
@@ -64,8 +56,7 @@ writes to myoutputdir.
 This is handy for seeing the new test results in another console window after
 you hit 'save' in your editor, without having to change window focus.
 
-Description
-===========
+## Description
 
 Rerun detects changes to files by polling file modification times once per
 second. It looks in the current directory and all its subdirectories. On
@@ -81,8 +72,7 @@ While polling sounds sub-optimal, I've yet to encounter a project large
 enough that rerun's resource usage was even noticeable. (Plus, see discussion
 of 'watchdog' below.)
 
-Dependencies
-============
+## Dependencies
 
 Tested on MacOSX, Ubuntu, WindowsXP, Windows 7.
 
@@ -91,18 +81,21 @@ Tested on Python 2.6, 2.7 and 3.4.
 Installing using 'pip' will also install any other Python packages that are
 required. (see setup.py 'install_requires')
 
-Hacking
-=======
+## Hacking
 
 To install development dependencies:
 
 on Python 2.6:
 
-    pip install -r requirements_dev_2.6.txt
+```
+pip install -r requirements_dev_2.6.txt
+```
 
 On later versions of Python:
 
-    pip install -r requirements_dev.txt
+```
+pip install -r requirements_dev.txt
+```
 
 These will also install the runtime dependencies (i.e. requirements.txt,
 which just references the 'install_requires' field in setup.py) so you only
@@ -110,13 +103,14 @@ ever need to install one requirements file.
 
 To run tests:
 
-    make test
+```
+make test
+```
 
 See the content of Makefile for a cheatsheet of other commonly used commands
 I use while working on rerun.
 
-TODO
-====
+## TODO
 
 Print a timestamp at the top of the screen, so user can see when the command
 was last run.
@@ -129,29 +123,30 @@ calling it from within "rerun". Then 'rerun' could be written simply as a Bash
 function. Other bash functions could use the same pattern to iterate after
 waiting for a keypress, or a sleep (to poll.)
 
-Known Problems
-==============
+## Known Problems
 
-See issues at https://github.com/tartley/rerun/issues
+See [project issues](https://github.com/tartley/rerun/issues).
 
-Alternatives
-============
+## Alternatives
 
-PyPI package 'watchdog' is a cross-platform library for handling file-system
-events, which includes script 'watchmedo', which looks like a more serious and
-heavy-duty version of 'Rerun'.
+* Instead of polling for differences like this, I wrote
+  [rerun2](https://github.com/tartley/rerun2) to be driven by filesystem events.
+* Nowadays I just use [entr](https://eradman.com/entrproject/) instead. It is Linux
+  specific, and driven by filesystem events, with all the positives and negatives that
+  implies, but it is very well done.
+* PyPI package 'watchdog' is a cross-platform library for handling file-system
+  events, which includes script 'watchmedo', which looks like a more serious and
+  heavy-duty version of 'Rerun'.
 
-https://pypi.python.org/pypi/watchdog
+  https://pypi.python.org/pypi/watchdog
 
-However, I can't get watchmedo to work for my primary use case, which is
-re-running tests when files are saved by Vim. This is due to the way Vim writes
-to temporary files and then moves the temp file to overwrite data atomically.
-Vim thus guarantees that the user never loses data, but also fails to generate
-the correct FS events that watchmedo is looking for.
+  However, I can't get watchmedo to work for my primary use case, which is
+  re-running tests when files are saved by Vim. This is due to the way Vim writes
+  to temporary files and then moves the temp file to overwrite data atomically.
+  Vim thus guarantees that the user never loses data, but also fails to generate
+  the correct FS events that watchmedo is looking for.
 
-
-Thanks
-======
+## Thanks
 
 Huge thanks to StackOverflow user 'rici', for explaining how to interpret
 shell aliases and functions in the given command using an interactive shell,
@@ -166,9 +161,7 @@ The idea came from the Bash command 'watch', and inspiration for this
 implementation came from an old blog post by Jeff Winkler, whos website
 http://jeffwinkler.net seems to have now died.
 
-
-Changes
-=======
+## Changes
 
 1.0.31
     Add deprecation warning. We're going to hand the PyPI name 'rerun'
@@ -222,15 +215,9 @@ Changes
     Now runs on Python 2.6, and is tested on Python 3.3.
 
 
-Contact
-=======
+## Contact
 
-:Documentation & download:
-    http://pypi.python.org/pypi/rerun/
-
-:Souce code and issues:
-    https://github.com/tartley/rerun
-
-:Contact the author:
-    Jonathan Hartley, email: tartley at domain tartley.com, Twitter: @tartley.
-
+[Documentation & download](http://pypi.python.org/pypi/rerun/)  
+[Souce code and issues](https://github.com/tartley/rerun)  
+Email: tartley at domain tartley.com
+[Mastodon]: [tartley@fosstodon.org](https://fosstodon.org/@tartley)
